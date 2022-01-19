@@ -1,0 +1,205 @@
+
+button {
+	font: inherit;
+	border-radius:0.5em;
+  background-color: #f8e0b1;
+  border: none;
+}
+
+input[type=text] {
+  font: inherit;
+  border: 2px solid lightblue;
+  border-radius: 0.5em;
+  width: 100%;
+  height: 100%;
+}
+
+.container-video {
+  display: grid;
+  grid-template-columns: 1fr 45%;
+  //grid-template-rows: 3fr 1fr 0%;
+  gap: 2% 2%;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "video coding"
+    "belowVideo nextSteps"
+    "footer footer";
+}
+
+.video { 
+  grid-area: video; 
+  margin: auto;
+}
+
+.coding {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2% 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "visitor"
+    "facilitator";
+  grid-area: coding;
+}
+
+.visitor {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 1% 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "visitorDemographics"
+    "vbfl"
+    "other";
+  grid-area: visitor;
+  border: 2px solid blue;
+  border-radius: 1em;
+  padding: 2%;
+}
+
+.visitor.button {
+  background-color: red;
+}
+
+.visitorDemographics {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    ". . . .";
+  grid-area: visitorDemographics;
+}
+
+.vbfl {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 0px 1%;
+  grid-auto-flow: row;
+  grid-template-areas:
+    ". . . . . . .";
+  grid-area: vbfl;
+}
+
+.other {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  grid-template-rows: 1fr;
+  gap: 0px 1%;
+  grid-auto-flow: row;
+  grid-template-areas:
+    ". .";
+  grid-area: other;
+}
+
+.facilitator {
+  display: grid;
+  grid-template-columns: 5fr 6fr;
+  grid-template-rows: 1fr 2fr 2fr;
+  gap: 1% 1%;
+  grid-auto-flow: row;
+  grid-template-areas:
+    ". ."
+    "comfort reflection"
+    "exhibitUse information";
+  grid-area: facilitator;
+  border: 2px solid green;
+  border-radius: 1em;
+  padding: 2%;
+   font-size:0.5em;
+}
+
+.comfort {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 0px 3%;
+  grid-auto-flow: row;
+  grid-template-areas:
+    ". . . . . .";
+  grid-area: comfort;
+  background-color: #b80f0a;
+  border-radius: 1em;
+  padding: 3%;
+}
+
+.reflection {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 0px 3%;
+  grid-auto-flow: row;
+  grid-template-areas:
+    ". . . . . .";
+  grid-area: reflection;
+  background-color: #046307;
+  border-radius: 1em;
+  padding: 3%;
+}
+
+.exhibitUse {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 0px 3%;
+  grid-auto-flow: row;
+  grid-template-areas:
+    ". . . . . .";
+  grid-area: exhibitUse;
+  background-color: #003b6f;
+  border-radius: 1em;
+  padding: 3%;
+}
+
+.information {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 0px 3%;
+  grid-auto-flow: row;
+  grid-template-areas:
+    ". . . . . .";
+  grid-area: information;
+  background-color: #fada5e;
+  border-radius: 1em;
+  padding: 3%;
+}
+
+.belowVideo{
+  display: grid;
+  grid-area: belowVideo;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 0px 2%;
+}
+
+.obs { 
+  border: 2px solid blue;
+  border-radius: 1em;
+  padding: 2%;
+}
+
+.codingList {  
+  border: 2px solid pink;
+  border-radius: 1em;
+  padding: 2%;
+
+  max-height: 250px;
+  overflow: auto;
+}
+
+.nextSteps {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8% 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "."
+    ".";
+  grid-area: nextSteps;
+  padding: 30px;
+}
