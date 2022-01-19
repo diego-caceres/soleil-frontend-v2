@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import CodingStart from './components/CodingStart';
 import CodingVideoNew from './components/CodingVideoNew';
 import CodingVideo from './components/CodingVideo';
@@ -11,6 +11,9 @@ function App() {
 
   return (
     <BrowserRouter basePath={BASE_PATH}>
+      <div style={{ padding: '20px' }}>
+        <Link to='/'> Home </Link>
+      </div>
       <Routes>
         <Route path={`${BASE_PATH}/`} element={<CodingStart />} />
         <Route path={`${BASE_PATH}/new-coding-video`} element={<CodingVideoNew />} />        

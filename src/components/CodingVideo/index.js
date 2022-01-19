@@ -2,6 +2,7 @@ import './CodingVideo.scss';
 import { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import ReactPlayer from 'react-player'
+import { useNavigate } from 'react-router-dom';
 
 import { loadBehaviorsForFacilitator, loadBehaviorsForVisitor } from 'src/redux/behaviors'
 import { saveCoding } from 'src/redux/codings';
@@ -11,12 +12,15 @@ import { toHHMMSS } from 'src/utils';
 // const videoURL = 'https://www.youtube.com/watch?v=Yq-Kfc81h5s';
 
 const CodingVideo = () => {
+  const navigate = useNavigate();
+
   const [codingBehaviors, setCodingBehaviors] = useState([]);
   const [showFacilitator, setShowFacilitator] = useState(false);
   const [gender, setGender] = useState('');
   const [ageRange, setAgeRange] = useState('');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
+  const [observations, setObservations] = useState('');
 
   const [facilitatorGender, setFacilitatorGender] = useState('');
   const [facilitatorAgeRange, setFacilitatorAgeRange] = useState('');
@@ -49,12 +53,26 @@ const CodingVideo = () => {
   const exhibitUseBehaviors = facilitatorBehaviors.filter(bh => bh.type === 'Exhibit Use');
   const informationBehaviors = facilitatorBehaviors.filter(bh => bh.type === 'Information');
 
+  const resetCoding = () => {
+    setGender('');
+    setAgeRange('');
+    setAmount('');
+    setDescription('');
+    setObservations('');
+    setShowFacilitator(false);
+    setFacilitatorGender('');
+    setFacilitatorAgeRange('');
+    setCodingBehaviors('');
+
+    playerRef.current.seekTo(0);
+  }
+
   const handleFacilitatorInteraction = () => {
     setShowFacilitator(true);
   }
 
   const onGenderSelected = (value) => {
-    setGender(value)
+    setGender(value);    
   }
 
   const onPhotoClicked = () => {
@@ -121,33 +139,33 @@ const CodingVideo = () => {
 
   const validateFields = () => {
     if (codingBehaviors.length === 0) {
-      alert('Debes agregar al menos un comportamiento!');
+      alert('Add at least one interaction!');
       return false;
     }
 
     if (gender.length === 0) {
-      alert('Debes indicar el género del visitante!');
+      alert('You have to select the visitor gender!');
       return false;
     }
 
     if (ageRange.length === 0) {
-      alert('Debes indicar la edad del visitante!');
+      alert('You have to select the visitor age!');
       return false;
     }
 
     if (amount.length === 0) {
-      alert('Debes indicar la cantidad de visitantes!');
+      alert('You have to select the visitors amount!');
       return false;
     }
 
     if (showFacilitator) {
       if (facilitatorGender.length === 0) {
-        alert('Debes indicar el género del facilitador!');
+        alert('You have to select the facilitator gender!');
         return false;
       }
   
       if (facilitatorAgeRange.length === 0) {
-        alert('Debes indicar la edad del facilitador!');
+        alert('You have to select the facilitator age!');
         return false;
       }
     }
@@ -172,15 +190,42 @@ const CodingVideo = () => {
           ageRange: facilitatorAgeRange    
         },
         codingBehaviors: codingBehaviors
-      }, (message) => {
+      }, (message, success) => {
         alert(message);
+
+        if (success) {
+          resetCoding();
+        }
       }));
     }
   }
 
   const onEndClicked = () => {
     if (validateFields()) {
-      
+      if (validateFields()) {
+        dispatch(saveCoding({
+          codingType: 'video',
+          exhibitId: selected.id,
+          evaluatorName: `${currentEvaluator?.name} ${currentEvaluator?.lastName}`,
+          visitor: {
+            gender: gender,
+            ageRange: ageRange,        
+            typeOfGroup: amount,
+            description: description      
+          },
+          facilitator: {
+            gender: facilitatorGender,
+            ageRange: facilitatorAgeRange    
+          },
+          codingBehaviors: codingBehaviors
+        }, (message, success) => {
+          alert(message);
+
+          if (success) {
+            navigate('/');
+          }
+        }));
+      }
     }
   }
 
@@ -189,7 +234,7 @@ const CodingVideo = () => {
   return (
     <div className="container-video">
       <div className="video">
-        <div div>Selected Exhibit: {selected.name}</div>
+        <div div>Selected Exhibit: {selected?.name}</div>
         <div div>Selected Coder: {currentEvaluator?.name} {currentEvaluator?.lastName}</div>
 
         <ReactPlayer
@@ -202,13 +247,18 @@ const CodingVideo = () => {
 
       <div className="belowVideo">
         <div className="obs">
-          <input type="text" placeholder="observations" />
+          <input 
+            value={observations}
+            onChange={(e) => setObservations(e.target.value)}
+            type="text"
+            placeholder="observations"
+          />
         </div>
         <div className="codingList">
-          <h2>Lista de interacciones:</h2>
+          <h2>Interactions list:</h2>
           {codingBehaviors.length === 0
           ? (
-            <p>No hay interacciones agregadas aún</p>
+            <p>No interactions added yet</p>
           )
           : (
             codingBehaviors.map((codingBehavior, codingIndex) => {
@@ -315,7 +365,7 @@ const CodingVideo = () => {
             </button>
             <input
               value={description}
-              onChange={(e) => setDescription(e.value.target)}
+              onChange={(e) => setDescription(e.target.value)}
               type="text"
               placeholder="visitor description" />
           </div>

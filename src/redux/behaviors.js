@@ -13,6 +13,7 @@ export const behaviorsSlice = createSlice({
   reducers: {
     setBehaviorsForVisitor: (state, action) => {
       const { forVisitor } = action.payload;
+      forVisitor.sort((a,b) => (a.name > b.name) ? 1 : -1);
       state.visitorBehaviors = forVisitor
     },
     setBehaviorsForFacilitator: (state, action) => {
@@ -49,6 +50,7 @@ export const loadBehaviorsForFacilitator = () => {
     .then(response => response.json())
     .then(behaviors => {
       if (behaviors.length) {
+
         dispatch(setBehaviorsForFacilitator({ forFacilitator: behaviors }));
       }
     });

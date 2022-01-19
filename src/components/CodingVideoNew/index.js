@@ -24,17 +24,38 @@ const CodingVideoNew = () => {
     }
   }
 
+  const startCodingButton = (
+    <Link to={selectedVideo ? '/coding-video' : ''} >
+      <button className="card" disabled={!selectedVideo}>
+        <div className="card-inner">
+          <span className="card-pin"></span>
+          <div className="card-content">
+            <h2 className="card-title">Start Coding</h2> 
+          </div>
+        </div>
+      </button>
+    </Link>
+  )
+
   return (
-    <div>
+    <div style={{ padding: '20px', textAlign: 'center' }}>
       <h1>New Video Coding</h1>
     
-      <h4>Seleccione un Video de la exhibición</h4>
+      <h4>Select a video from the exhibition</h4>
+      {startCodingButton}
       {
         currentExhibitVideos.map((video) => {
           const { id, url } = video;
+          const selected = selectedVideo?.id === id;
+          const divStyle = { 
+            display: 'flex',
+            width: 'fit-content',
+            margin: 'auto',
+            border: selected ? '2px solid red' : '',
+          };
           return (
-            <div key={url}>
-              <button onClick={() => handleVideoSelect(video)}> Seleccionar</button>
+            <div key={url} style={divStyle}>
+              <button onClick={() => handleVideoSelect(video)}> Select video</button>
               <div className='video-thumbnail'>
                 <ReactPlayer
                   url={url}
@@ -47,16 +68,7 @@ const CodingVideoNew = () => {
         })
       }
 
-      <Link to={selectedVideo ? '/coding-video' : ''} >
-        <button className="card" disabled={!selectedVideo}>
-          <div className="card-inner">
-            <span className="card-pin"></span>
-            <div className="card-content">
-              <h2 className="card-title">Comenzar Coding</h2> 
-            </div>
-          </div>
-        </button>
-      </Link>
+      {startCodingButton}
     </div>
   );
 }

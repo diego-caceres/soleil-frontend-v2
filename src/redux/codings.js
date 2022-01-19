@@ -42,11 +42,11 @@ export const saveCoding = (codingToSave, callback) => {
       debugger
       if (coding.id) {
         if (callback) {
-          callback('El coding se guardó con éxito');
+          callback('El coding se guardó con éxito', true);
         }
       } else {
         if (callback) {
-          callback('Ocurrió un error: ' + coding.message);
+          callback('Ocurrió un error: ' + coding.message, false);
         }
       }
     })
