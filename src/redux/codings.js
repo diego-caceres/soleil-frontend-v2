@@ -22,7 +22,6 @@ export default codingsSlice.reducer
 
 export const saveCoding = (codingToSave, callback) => {
   return (dispatch) => {
-
     dispatch(toggleSavingCoding());
 
     const data = {
@@ -39,7 +38,6 @@ export const saveCoding = (codingToSave, callback) => {
     })
     .then(response => response.json())
     .then(coding => {
-      debugger
       if (coding.id) {
         if (callback) {
           callback('El coding se guardó con éxito', true);

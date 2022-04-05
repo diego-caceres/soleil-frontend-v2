@@ -83,7 +83,7 @@ const CodingStart = () => {
             </div>
           </button>
         </Link>
-        <Link to={selected && currentEvaluator ? '/new-coding-video' : ''} >
+        <Link to={selected && currentEvaluator ? '/coding-video' : ''} >
           <button className="card" disabled={!selected || !currentEvaluator}>
             <div className="card-inner">
               <span className="card-pin"></span>

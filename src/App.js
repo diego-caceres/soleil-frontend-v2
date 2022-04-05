@@ -11,18 +11,10 @@ function App() {
 
   return (
     <BrowserRouter basePath={BASE_PATH}>
-      <div style={{ padding: '20px' }}>
-        <Link to='/'> Home </Link>
-      </div>
       <Routes>
         <Route path={`${BASE_PATH}/`} element={<CodingStart />} />
-        <Route path={`${BASE_PATH}/new-coding-video`} element={<CodingVideoNew />} />        
         <Route path={`${BASE_PATH}/coding-video`} element={<CodingVideo />} />
         <Route path={`${BASE_PATH}/new-coding-live`} element={<CodingLive />} />
-        {/* <Route path={`${BASE_PATH}/workflows/*`} element={<ProjectsIndex />} />
-        <Route path={`${BASE_PATH}/templates/*`} element={<TemplatesIndex />} />
-        <Route path={`${BASE_PATH}/models/dashboard/*`} element={<ModelsDashboardIndex />} />
-        <Route path={`${BASE_PATH}/models/explore/*`} element={<ModelsIndex />} /> */}
       </Routes>
     </BrowserRouter>
   );

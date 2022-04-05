@@ -14,6 +14,206 @@ input[type=text] {
   height: 100%;
 }
 
+.video-coding-container {
+  background-color: red;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .header-row {
+    background-color: goldenrod;
+    color: white;
+    padding: 5px 10px;
+    font-weight: bold;
+  }
+
+  .top-half {
+    height: 40%;
+
+    background-color: grey;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+
+    .video-section { 
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      
+      grid-area: video;
+      margin: auto;
+      flex: 0.5;
+    }
+
+    .list-interactions-section {
+      flex: 0.5;
+      background-color: pink;
+      height: 100%;
+
+      padding: 30px;
+      overflow-y: hidden;
+      display: flex;
+      flex-direction: column;
+
+
+      .title-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      .list-row {
+        overflow-y: scroll;
+      }
+    }
+
+    .end-section {
+      flex: 0.3;
+
+    }
+  }
+
+  .bottom-half {
+    background-color: green;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    height: 60%;
+    
+    .visitor-section {
+      background-color: aquamarine;
+      flex: 1;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+
+      .top-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        
+      }
+
+      .bottom-row {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+
+        .left-col {
+          flex: 1;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+
+          .visitor-row {
+            flex: 1;
+            height: 100%;
+          }
+
+          .observation-row {
+            flex: 2;
+            height: 100%;
+          }
+        }
+
+        .right-col {
+          flex: 2;
+        
+          .visitor-behaviors-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+
+            padding: 0 30px;            
+          }
+
+          .visitor-behaviors-container > .visitor-behaviors-item {
+            flex: 1 1 30%; /*grow | shrink | basis */
+            height: 110px;
+          }
+          
+          .visitor-behaviors-item {
+            padding: 15px;
+
+            button {
+              width: 100%;
+              height: 100%;
+              border-radius: 6px;
+            }
+          }
+        }
+      }
+    }
+
+    .facilitator-section {
+      background-color: chocolate;
+      flex: 1;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+
+      .top-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        
+      }
+
+      .bottom-row {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+
+        .facilitator-behaviors-container {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: center;
+
+          padding: 0 30px;            
+        }
+
+        .facilitator-behaviors-container > .facilitator-behaviors-item {
+          flex: 1 1 20%; /*grow | shrink | basis */
+          height: 80px;
+        }
+        
+        .facilitator-behaviors-item {
+          padding: 5px;
+
+          button {
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+          }
+
+          .confort-behavior-btn {
+            background-color: brown;
+          }
+
+          .reflection-behavior-btn {
+            background-color: burlywood;
+          }
+
+          .exhibitUse-behavior-btn {
+            background-color: orange;
+          }
+
+          .information-behavior-btn {
+            background-color: purple;
+          }
+        }
+      }
+    }
+  }
+
+}
+
 .container-video {
   display: grid;
   grid-template-columns: 1fr 45%;
@@ -26,10 +226,6 @@ input[type=text] {
     "footer footer";
 }
 
-.video { 
-  grid-area: video; 
-  margin: auto;
-}
 
 .coding {
   display: grid;

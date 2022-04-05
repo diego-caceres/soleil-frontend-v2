@@ -3,39 +3,42 @@ import { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import ReactPlayer from 'react-player'
 import { useNavigate } from 'react-router-dom';
+import Select from 'react-select';
 
 import { loadBehaviorsForFacilitator, loadBehaviorsForVisitor } from 'src/redux/behaviors'
 import { saveCoding } from 'src/redux/codings';
 import { toHHMMSS } from 'src/utils';
-
-// const videoURL = 'https://rr6---sn-x1x7zn7e.c.drive.google.com/videoplayback?expire=1636077174&ei=NVaEYbeFPNv1u7APib64oAU&ip=190.134.235.148&cp=QVRIWEFfVlFVRVhPOkl5OG5sYllZb19uc3htVGFtYWpXSjl5TGQ0V0RPekYxdXFpbVk2SnZ5TEQ&id=9d21bbc61defbd6c&itag=18&source=webdrive&requiressl=yes&mh=Cu&mm=32&mn=sn-x1x7zn7e&ms=su&mv=u&mvi=6&pl=21&ttl=transient&susc=dr&driveid=1plI9iaKaIiy3rZzHAk-oKMU1pWb9tCKT&app=explorer&mime=video/mp4&vprv=1&prv=1&dur=22.755&lmt=1634857893598685&mt=1636061035&sparams=expire,ei,ip,cp,id,itag,source,requiressl,ttl,susc,driveid,app,mime,vprv,prv,dur,lmt&sig=AOq0QJ8wRAIgFZ8ca7tc_CbgvySB7BKakjrVEfoV_U0EsGu2SosB7vICIANBkibIF80T0SdLIxz4ub7GTHbDLNUmYVGW-78aHdZx&lsparams=mh,mm,mn,ms,mv,mvi,pl&lsig=AG3C_xAwRQIhAL0AYbtxRux_svZxcKdmuBnXfSRou2QhfT1aDCgGSjbQAiAUMLwUMYtcOvuQtAA6XDMU9qYYx5aflDEw_1aye0kDQg==&cpn=FI_VBZ88GWDMGhpY&c=WEB_EMBEDDED_PLAYER&cver=1.20211031.00.00';
-// const videoURL = 'https://www.youtube.com/watch?v=Yq-Kfc81h5s';
+import { genderOptions, ageOptions, groupOptions } from 'src/constants';
 
 const CodingVideo = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const playerRef = useRef();
 
   const [codingBehaviors, setCodingBehaviors] = useState([]);
   const [showFacilitator, setShowFacilitator] = useState(false);
-  const [gender, setGender] = useState('');
-  const [ageRange, setAgeRange] = useState('');
-  const [amount, setAmount] = useState('');
+
+  const [gender, setGender] = useState(null);
+  const [ageRange, setAgeRange] = useState(null);
+  const [amount, setAmount] = useState(null);
   const [description, setDescription] = useState('');
+  const [language, setLanguage] = useState('Spanish');
+
+  const [dayStatus, setDayStatus] = useState('Not Busy');
   const [observations, setObservations] = useState('');
 
-  const [facilitatorGender, setFacilitatorGender] = useState('');
-  const [facilitatorAgeRange, setFacilitatorAgeRange] = useState('');
+  const [facilitatorGender, setFacilitatorGender] = useState(null);
+  const [facilitatorAgeRange, setFacilitatorAgeRange] = useState(null);
+
+  const [videoURL, setVideoURL] = useState('');
+  const [videoName, setVideoName] = useState('');
 
   const exhibitsStore = useSelector((state) => state.exhibits);
-  const { selected, currentEvaluator, selectedVideo } = exhibitsStore;
+  const { selected, currentEvaluator } = exhibitsStore;
   const behaviorsStore = useSelector((state) => state.behaviors);
   const { visitorBehaviors, facilitatorBehaviors } = behaviorsStore;
   const codingsStore = useSelector((state) => state.codings);
   const { savingCoding } = codingsStore;
-
-
-  const dispatch = useDispatch()
-  const playerRef = useRef();
-
 
   // componentDidMount
   useEffect(() => {
@@ -53,40 +56,31 @@ const CodingVideo = () => {
   const exhibitUseBehaviors = facilitatorBehaviors.filter(bh => bh.type === 'Exhibit Use');
   const informationBehaviors = facilitatorBehaviors.filter(bh => bh.type === 'Information');
 
+
+  // Handle File Search
+  const handleFileClicked = (ev) => {
+    const file = ev.target.files[0];
+    setVideoURL(URL.createObjectURL(file));
+    setVideoName(file.name);
+  }
+
   const resetCoding = () => {
-    setGender('');
-    setAgeRange('');
-    setAmount('');
+    setGender(null);
+    setAgeRange(null);
+    setAmount(null);
     setDescription('');
     setObservations('');
     setShowFacilitator(false);
-    setFacilitatorGender('');
-    setFacilitatorAgeRange('');
+    setFacilitatorGender(null);
+    setFacilitatorAgeRange(null);
     setCodingBehaviors('');
 
-    playerRef.current.seekTo(0);
+    setVideoName('');
+    setVideoURL('');
   }
 
   const handleFacilitatorInteraction = () => {
     setShowFacilitator(true);
-  }
-
-  const onGenderSelected = (value) => {
-    setGender(value);    
-  }
-
-  const onPhotoClicked = () => {
-    const seconds = getVideoTimeInSeconds();
-    const photobehavior = {
-      name: 'Visitor took a photo!',
-      forVisitor: true,
-      timeMarked: seconds
-    }
-    const newList = [
-      photobehavior,
-      ...codingBehaviors,
-    ]
-    setCodingBehaviors(newList);
   }
 
   const addBehaviorToCoding = (behavior) => {
@@ -143,28 +137,28 @@ const CodingVideo = () => {
       return false;
     }
 
-    if (gender.length === 0) {
+    if (!gender || gender.value.length === 0) {
       alert('You have to select the visitor gender!');
       return false;
     }
 
-    if (ageRange.length === 0) {
+    if (!ageRange || ageRange.value.length === 0) {
       alert('You have to select the visitor age!');
       return false;
     }
 
-    if (amount.length === 0) {
+    if (!amount || amount.value.length === 0) {
       alert('You have to select the visitors amount!');
       return false;
     }
 
     if (showFacilitator) {
-      if (facilitatorGender.length === 0) {
+      if (!facilitatorGender || facilitatorGender.value.length === 0) {
         alert('You have to select the facilitator gender!');
         return false;
       }
   
-      if (facilitatorAgeRange.length === 0) {
+      if (!facilitatorAgeRange || facilitatorAgeRange.value.length === 0) {
         alert('You have to select the facilitator age!');
         return false;
       }
@@ -173,88 +167,85 @@ const CodingVideo = () => {
     return true;
   }
 
+  const sendCodingToBackend = (callback) => {
+    const videoDuration = playerRef.current.getDuration();
+    dispatch(saveCoding({
+      codingType: 'video',
+      exhibitId: selected.id,
+      evaluatorId: currentEvaluator.id,
+      evaluatorName: `${currentEvaluator?.name} ${currentEvaluator?.lastName}`,
+      extraObservations: observations,
+      dayStatus: dayStatus,
+      visitor: {
+        gender: gender.value,
+        ageRange: ageRange.value,        
+        typeOfGroup: amount.value,
+        description: description,
+        language: language,
+      },
+      showFacilitator: showFacilitator,
+      facilitator: {
+        gender: showFacilitator ? facilitatorGender.value : '',
+        ageRange: showFacilitator ? facilitatorAgeRange.value : ''
+      },
+      codingBehaviors: codingBehaviors,
+      videoName,
+      videoDuration
+    }, callback));
+  }
+
   const onNewVisitorClicked = () => {
     if (validateFields()) {
-      dispatch(saveCoding({
-        codingType: 'video',
-        exhibitId: selected.id,
-        evaluatorName: `${currentEvaluator?.name} ${currentEvaluator?.lastName}`,
-        visitor: {
-          gender: gender,
-          ageRange: ageRange,        
-          typeOfGroup: amount,
-          description: description      
-        },
-        facilitator: {
-          gender: facilitatorGender,
-          ageRange: facilitatorAgeRange    
-        },
-        codingBehaviors: codingBehaviors
-      }, (message, success) => {
-        alert(message);
+      sendCodingToBackend(
+        (message, success) => {
+          alert(message);
 
-        if (success) {
-          resetCoding();
+          if (success) {
+            resetCoding();
+          }
         }
-      }));
+      );
     }
   }
 
   const onEndClicked = () => {
     if (validateFields()) {
-      if (validateFields()) {
-        dispatch(saveCoding({
-          codingType: 'video',
-          exhibitId: selected.id,
-          evaluatorName: `${currentEvaluator?.name} ${currentEvaluator?.lastName}`,
-          visitor: {
-            gender: gender,
-            ageRange: ageRange,        
-            typeOfGroup: amount,
-            description: description      
-          },
-          facilitator: {
-            gender: facilitatorGender,
-            ageRange: facilitatorAgeRange    
-          },
-          codingBehaviors: codingBehaviors
-        }, (message, success) => {
+      sendCodingToBackend(
+        (message, success) => {
           alert(message);
 
           if (success) {
             navigate('/');
           }
-        }));
-      }
+        }
+      );
     }
   }
 
-  const videoURL = selectedVideo?.url;
-
   return (
-    <div className="container-video">
-      <div className="video">
-        <div div>Selected Exhibit: {selected?.name}</div>
-        <div div>Selected Coder: {currentEvaluator?.name} {currentEvaluator?.lastName}</div>
-
-        <ReactPlayer
-          url={videoURL}
-          ref={playerRef}
-          controls
-        />
-        
-      </div>
-
-      <div className="belowVideo">
-        <div className="obs">
-          <input 
-            value={observations}
-            onChange={(e) => setObservations(e.target.value)}
-            type="text"
-            placeholder="observations"
-          />
+    <div className="video-coding-container">
+      <div className="header-row">Video Coding!! | Exhibit: {selected.name} | Evaluator: {`${currentEvaluator.name} ${currentEvaluator.lastName}`} | <a href='/'>Go Back</a></div>      
+      <div className="top-half">
+        <div className="video-section">
+          {/* <div div>Selected Exhibit: {selected?.name}</div>
+          <div div>Selected Coder: {currentEvaluator?.name} {currentEvaluator?.lastName}</div> */}
+          {videoURL ? (
+            <ReactPlayer
+              url={videoURL}
+              ref={playerRef}
+              controls
+            />
+          ) : (
+            <div>
+              <label>Seleccione un video de su computadora</label>
+              <input id="upload" type="file" accept="video/*"
+                onChange={handleFileClicked}
+              />
+            </div>
+          )}
+          
         </div>
-        <div className="codingList">
+        <div className="list-interactions-section">
           <h2>Interactions list:</h2>
           {codingBehaviors.length === 0
           ? (
@@ -277,215 +268,188 @@ const CodingVideo = () => {
               )
             })
           )}
-        </div>
-      </div>
-
-      <div className="coding">
-        <div className="visitor">
-          <div className="visitorDemographics">
-            <div>
-              <button
-                onClick={() => onGenderSelected('female')}
-                style={gender === 'female' ? { border: '1px solid red' } : {}}
-              >
-                Female
-              </button>
-              <button
-                onClick={() => onGenderSelected('male')}
-                style={gender === 'male' ? { border: '1px solid red' } : {}}
-              >
-                Male
-              </button>
-            </div>
-            <div>
-              <button
-                onClick={() => setAgeRange('teen')}
-                style={ageRange === 'teen' ? { border: '1px solid red' } : {}}
-              >
-                Teen
-              </button>
-              <button
-                onClick={() => setAgeRange('youngAdult')}
-                style={ageRange === 'youngAdult' ? { border: '1px solid red' } : {}}
-              >
-                Young adult
-              </button>
-              <button
-                onClick={() => setAgeRange('adult')}
-                style={ageRange === 'adult' ? { border: '1px solid red' } : {}}
-              >
-                Adult              
-              </button>
-              <button
-                onClick={() => setAgeRange('senior')}
-                style={ageRange === 'senior' ? { border: '1px solid red' } : {}}
-              >
-                Senior
-              </button>
-            </div>
-            <div>
-              <button
-                onClick={() => setAmount('alone')}
-                style={amount === 'alone' ? { border: '1px solid red' } : {}}
-              >
-                Alone
-              </button>
-              <button
-                onClick={() => setAmount('2people')}
-                style={amount === '2people' ? { border: '1px solid red' } : {}}
-              >
-                2 people
-              </button>
-              <button
-                onClick={() => setAmount('3+people')}
-                style={amount === '3+people' ? { border: '1px solid red' } : {}}
-              >
-                3+ people
-              </button>
-            </div>
-
-          </div>
-        
-          <div className="vbfl">
-            {visitorBehaviors.map(behavior => {
-              const { name } = behavior;
-              return (
-                <button
-                  key={name}
-                  onClick={() => addBehaviorToCoding(behavior)}
-                >
-                  {name}
-                </button>
-              );
-            })}            
-          </div>
-          <div className="other">
-            <button disabled={showFacilitator} onClick={handleFacilitatorInteraction}>
-              facilitator interaction
+          <div className="nextSteps">
+            <button
+              onClick={onNewVisitorClicked}
+              disabled={savingCoding}
+            >
+              new visitor
             </button>
-            <input
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              type="text"
-              placeholder="visitor description" />
+            <button
+              onClick={onEndClicked}
+              disabled={savingCoding}
+            >
+              end
+            </button>
           </div>
         </div>
-        
-        {showFacilitator && (
-          <div className="facilitator">
-            <div>
-              <button
-                onClick={() => setFacilitatorGender('female')}
-                style={facilitatorGender === 'female' ? { border: '1px solid red' } : {}}
-              >
-                Female
-              </button>
-              <button
-                onClick={() => setFacilitatorGender('male')}
-                style={facilitatorGender === 'male' ? { border: '1px solid red' } : {}}
-              >
-                Male
-              </button>
+      </div>
+      
+      <div className="bottom-half">
+        <div className="visitor-section"> 
+          <div className="top-row">
+            <Select
+              placeholder="Gender"
+              options={genderOptions}
+              value={gender}
+              onChange={setGender}
+            />
+
+            <Select
+              placeholder="Age"
+              options={ageOptions}
+              value={ageRange}
+              onChange={setAgeRange}
+            />
+
+            <Select
+              placeholder="Group"
+              value={amount}
+              options={groupOptions}
+              onChange={setAmount}
+            />
+          </div>
+          <div className="bottom-row">
+            <div className="left-col">
+              <div className="visitor-row">
+                <input
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  type="text"
+                  placeholder="visitor description"
+                />
+              </div>
+              <div className="observation-row">
+                <input 
+                  value={observations}
+                  onChange={(e) => setObservations(e.target.value)}
+                  type="text"
+                  placeholder="observations"
+                />
+              </div>
             </div>
-            <div>
-              <button
-                onClick={() => setFacilitatorAgeRange('teen')}
-                style={facilitatorAgeRange === 'teen' ? { border: '1px solid red' } : {}}
-              >
-                Teen
-              </button>
-              <button
-                onClick={() => setFacilitatorAgeRange('youngAdult')}
-                style={facilitatorAgeRange === 'youngAdult' ? { border: '1px solid red' } : {}}
-              >
-                Young adult
-              </button>
-              <button
-                onClick={() => setFacilitatorAgeRange('adult')}
-                style={facilitatorAgeRange === 'adult' ? { border: '1px solid red' } : {}}
-              >
-                Adult              
-              </button>
-              <button
-                onClick={() => setFacilitatorAgeRange('senior')}
-                style={facilitatorAgeRange === 'senior' ? { border: '1px solid red' } : {}}
-              >
-                Senior
-              </button>
-            </div>
-            <div className="comfort">
-              {confortBehaviors.map(behavior => {
-                const { name } = behavior;
-                return (
-                  <button
-                    key={name}
-                    onClick={() => addBehaviorToCoding(behavior)}
-                  >
-                    {name}
+            <div className="right-col">
+              <div className="visitor-behaviors-container">
+                {visitorBehaviors.map(behavior => {
+                  const { name } = behavior;
+                  return (
+                    <div
+                      key={name}
+                      className="visitor-behaviors-item"
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                      >
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+                <div className="visitor-behaviors-item">
+                  <button disabled={showFacilitator} onClick={handleFacilitatorInteraction}>
+                    Facilitator Interaction
                   </button>
-                );
-              })} 
-            </div>
-            <div className="reflection">
-              {reflectionBehaviors.map(behavior => {
-                const { name } = behavior;
-                return (
-                  <button
-                    key={name}
-                    onClick={() => addBehaviorToCoding(behavior)}
-                  >
-                    {name}
-                  </button>
-                );
-              })} 
-            </div>
-            <div className="exhibitUse">
-              {exhibitUseBehaviors.map(behavior => {
-                const { name } = behavior;
-                return (
-                  <button
-                    key={name}
-                    onClick={() => addBehaviorToCoding(behavior)}
-                  >
-                    {name}
-                  </button>
-                );
-              })} 
-            </div>
-            <div className="information">
-              {informationBehaviors.map(behavior => {
-                const { name } = behavior;
-                return (
-                  <button
-                    key={name}
-                    onClick={() => addBehaviorToCoding(behavior)}
-                  >
-                    {name}
-                  </button>
-                );
-              })}
+                </div>
+              </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+        <div className="facilitator-section">
+          {showFacilitator && (
+            <>
+              <div className="top-row">
+                <Select
+                  placeholder="Gender"
+                  options={genderOptions}
+                  value={facilitatorGender}
+                  onChange={setFacilitatorGender}
+                />
 
-      <div className="nextSteps">
-        <button
-          onClick={onNewVisitorClicked}
-          disabled={savingCoding}
-        >
-          new visitor
-        </button>
-        <button
-          onClick={onEndClicked}
-          disabled={savingCoding}
-        >
-          end
-        </button>
+                <Select
+                  placeholder="Age"
+                  options={ageOptions}
+                  value={facilitatorAgeRange}
+                  onChange={setFacilitatorAgeRange}
+                />
+
+              </div>
+              <div className="bottom-row">
+                <div className="facilitator-behaviors-container">
+                  {confortBehaviors.map(behavior => {
+                    const { name } = behavior;
+                    return (
+                      <div
+                        key={name}
+                        className="facilitator-behaviors-item"
+                      >
+                        <button
+                          onClick={() => addBehaviorToCoding(behavior)}
+                          className="confort-behavior-btn"
+                        >
+                          {name}
+                        </button>
+                      </div>
+                    );
+                  })}
+                  {reflectionBehaviors.map(behavior => {
+                    const { name } = behavior;
+                    return (
+                      <div
+                        key={name}
+                        className="facilitator-behaviors-item"
+                      >
+                        <button
+                          onClick={() => addBehaviorToCoding(behavior)}
+                          className="reflection-behavior-btn"
+                        >
+                          {name}
+                        </button>
+                      </div>
+                    );
+                  })}
+                  {exhibitUseBehaviors.map(behavior => {
+                    const { name } = behavior;
+                    return (
+                      <div
+                        key={name}
+                        className="facilitator-behaviors-item"
+                      >
+                        <button
+                          onClick={() => addBehaviorToCoding(behavior)}
+                          className="exhibitUse-behavior-btn"
+                        >
+                          {name}
+                        </button>
+                      </div>
+                    );
+                  })}
+                  {informationBehaviors.map(behavior => {
+                    const { name } = behavior;
+                    return (
+                      <div
+                        key={name}
+                        className="facilitator-behaviors-item"
+                      >
+                        <button
+                          onClick={() => addBehaviorToCoding(behavior)}
+                          className="information-behavior-btn"
+                        >
+                          {name}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>        
+              </div>
+            </>
+          )}
+        </div>       
       </div>
-      <div className="footer">
+      
+      {/* <div className="footer" style={{ marginLeft: '5px' }}>
         <p>(C) Sole is awesome, 2021</p>
-      </div>
+        <p>(C) Diego is awesomer, 2022</p>
+      </div> */}
     </div>
   );
 }
