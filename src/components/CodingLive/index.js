@@ -215,6 +215,17 @@ const CodingLive = () => {
     }
   }
 
+  if (!selected || !currentEvaluator) {
+    return (
+      <div>
+        <p>
+          No Exhibit selected, or no Evaluator selected.
+        </p>
+        <a href='/'>Go Back</a>
+      </div>
+    );
+  }
+
   return (
     <div className="live-coding-container">
       <div className="header-row">Live Coding!! | Exhibit: {selected.name} | Evaluator: {`${currentEvaluator.name} ${currentEvaluator.lastName}`} | <a href='/'>Go Back</a></div>
@@ -228,7 +239,7 @@ const CodingLive = () => {
                 {stopWatchToShow}
               </div>
             ) : (
-              <div>
+              <div className='timer-button'>
                 <button onClick={handleStartTimer}>Start</button>
               </div>
             )}

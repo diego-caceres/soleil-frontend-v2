@@ -246,28 +246,32 @@ const CodingVideo = () => {
           
         </div>
         <div className="list-interactions-section">
-          <h2>Interactions list:</h2>
-          {codingBehaviors.length === 0
-          ? (
-            <p>No interactions added yet</p>
-          )
-          : (
-            codingBehaviors.map((codingBehavior, codingIndex) => {
-              const { name, forVisitor, forFacilitator, timeMarked, timeEnded } = codingBehavior;
-              let timeRange = `at ${toHHMMSS(timeMarked)}`;
-              if (timeEnded) {
-                timeRange = `${timeRange} until ${toHHMMSS(timeEnded)}`
-              }
-              return (
-                <div key={codingIndex}>
-                  {forVisitor && <span>Visitor => </span>}
-                  {forFacilitator && <span>Facilitator => </span>}
-                  {name} <button onClick={() => goToVideoAt(timeMarked)}> {`[${timeRange}]`} </button>
-                  - <button onClick={() => removeCoding(codingIndex)}> X </button>
-                </div>
-              )
-            })
-          )}
+          <div className="title-row">
+            <h2>List of interactions</h2>
+          </div>
+          <div className="list-row">
+            {codingBehaviors.length === 0
+            ? (
+              <p>No interactions added yet</p>
+            )
+            : (
+              codingBehaviors.map((codingBehavior, codingIndex) => {
+                const { name, forVisitor, forFacilitator, timeMarked, timeEnded } = codingBehavior;
+                let timeRange = `at ${toHHMMSS(timeMarked)}`;
+                if (timeEnded) {
+                  timeRange = `${timeRange} until ${toHHMMSS(timeEnded)}`
+                }
+                return (
+                  <div key={codingIndex}>
+                    {forVisitor && <span>Visitor => </span>}
+                    {forFacilitator && <span>Facilitator => </span>}
+                    {name} <button onClick={() => goToVideoAt(timeMarked)}> {`[${timeRange}]`} </button>
+                    - <button onClick={() => removeCoding(codingIndex)}> X </button>
+                  </div>
+                )
+              })
+            )}
+          </div>
           <div className="nextSteps">
             <button
               onClick={onNewVisitorClicked}
