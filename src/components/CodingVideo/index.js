@@ -88,11 +88,14 @@ const CodingVideo = () => {
     let newList = [
       ...codingBehaviors,
     ]
+  
     // If it is the same as the last behavior added, it is the end time
-    const lastBehavior = codingBehaviors.length > 0 ? codingBehaviors[0] : null;
+    const behaviorsOfSameType = codingBehaviors.filter(c => c.forVisitor === behavior.forVisitor);
+    const lastBehavior = behaviorsOfSameType.length > 0 ? behaviorsOfSameType[0] : null;
     if (lastBehavior && lastBehavior.id === behavior.id) {
       // Add End Time
-      newList[0].timeEnded = seconds;
+      const index = newList.findIndex(cb => cb.id === lastBehavior.id);
+      newList[index].timeEnded = seconds;
     } 
     else {
       // New Behavior at the beginning of the list
