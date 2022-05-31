@@ -1,5 +1,5 @@
 import './CodingLive.scss';
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
 import { useStopwatch } from 'react-timer-hook';
@@ -9,7 +9,7 @@ import Select from 'react-select';
 import { loadBehaviorsForFacilitator, loadBehaviorsForVisitor } from 'src/redux/behaviors'
 import { saveCoding } from 'src/redux/codings';
 import { toHHMMSS } from 'src/utils';
-import { genderOptions, ageOptions, groupOptions } from 'src/constants';
+import { genderOptions, ageOptions, groupOptions, languageOptions, dayStatusOptions } from 'src/constants';
 
 
 const CodingLive = () => {
@@ -35,9 +35,9 @@ const CodingLive = () => {
   const [ageRange, setAgeRange] = useState(null);
   const [amount, setAmount] = useState(null);
   const [description, setDescription] = useState('');
-  const [language, setLanguage] = useState('Spanish');
+  const [language, setLanguage] = useState({ value: 'spanish', label: 'Spanish' });
 
-  const [dayStatus, setDayStatus] = useState('Not Busy');
+  const [dayStatus, setDayStatus] = useState({ value: 'nonBusyDat', label: 'Non busy day' });
   const [observations, setObservations] = useState('');
 
   const [facilitatorGender, setFacilitatorGender] = useState(null);
@@ -54,6 +54,8 @@ const CodingLive = () => {
   useEffect(() => {
     dispatch(loadBehaviorsForFacilitator());
     dispatch(loadBehaviorsForVisitor());
+  
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (visitorBehaviors.length === 0 || facilitatorBehaviors.length === 0) {
@@ -75,7 +77,7 @@ const CodingLive = () => {
     setShowFacilitator(false);
     setFacilitatorGender(null);
     setFacilitatorAgeRange(null);
-    setCodingBehaviors('');
+    setCodingBehaviors([]);
 
     pause();
     reset();
@@ -85,10 +87,6 @@ const CodingLive = () => {
   const handleStartTimer = () => {
     setTimerStarted(true);
     start();
-  }
-
-  const handleFacilitatorInteraction = () => {
-    setShowFacilitator(true);
   }
 
   const addBehaviorToCoding = (behavior) => {
@@ -101,14 +99,20 @@ const CodingLive = () => {
       ...codingBehaviors,
     ]
 
-    // If it is the same as the last behavior added, it is the end time
-    const behaviorsOfSameType = codingBehaviors.filter(c => c.forVisitor === behavior.forVisitor);
-    const lastBehavior = behaviorsOfSameType.length > 0 ? behaviorsOfSameType[0] : null;
-    if (lastBehavior && lastBehavior.id === behavior.id) {
+    if (behavior.forFacilitator && !showFacilitator) {
+      // On the first Facilitator Behavior, we turn the flag on for validations
+      setShowFacilitator(true);
+    }
+
+    // If this behavior was added before, with no end time, it is the end time
+    // Photo is instant
+    const behaviorsOfSameId = codingBehaviors.filter(c => c.id === behavior.id && c.name !== 'Photo');
+    const lastBehavior = behaviorsOfSameId.length > 0 ? behaviorsOfSameId[0] : null;
+    if (lastBehavior && !lastBehavior.timeEnded) {
       // Add End Time
       const index = newList.findIndex(cb => cb.id === lastBehavior.id);
       newList[index].timeEnded = currentSeconds;
-    } 
+    }
     else {
       // New Behavior at the beginning of the list
       const codingBehavior = {
@@ -173,13 +177,13 @@ const CodingLive = () => {
       evaluatorId: currentEvaluator.id,
       evaluatorName: `${currentEvaluator?.name} ${currentEvaluator?.lastName}`,
       extraObservations: observations,
-      dayStatus: dayStatus,
+      dayStatus: dayStatus.value,
       visitor: {
         gender: gender.value,
         ageRange: ageRange.value,        
         typeOfGroup: amount.value,
         description: description,
-        language: language,
+        language: language.value,
       },
       showFacilitator: showFacilitator,
       facilitator: {
@@ -233,7 +237,174 @@ const CodingLive = () => {
     <div className="live-coding-container">
       <div className="header-row">Live Coding!! | Exhibit: {selected.name} | Evaluator: {`${currentEvaluator.name} ${currentEvaluator.lastName}`} | <a href='/'>Go Back</a></div>
       <div className="top-half">
-        <div className="list-interactions-section">
+        <div className="visitor-section">
+          <div className="first-row">
+            <div className="visitor-behaviors-container">
+              {visitorBehaviors.map(behavior => {
+                const { name } = behavior;
+                return (
+                  <div
+                    key={name}
+                    className="visitor-behaviors-item"
+                  >
+                    <button
+                      onClick={() => addBehaviorToCoding(behavior)}
+                    >
+                      {name}
+                    </button>
+                  </div>
+                );
+              })}                
+            </div>
+          </div>
+          <div className="second-row">
+            <div className="visitor-row">
+              <input
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                type="text"
+                placeholder="visitor description"
+              />
+            </div>
+            <div className="observation-row">
+              <input 
+                value={observations}
+                onChange={(e) => setObservations(e.target.value)}
+                type="text"
+                placeholder="observations"
+              />
+            </div>
+          </div>
+          <div className="third-row">
+            <Select
+                placeholder="Gender"
+                options={genderOptions}
+                value={gender}
+                onChange={setGender}
+              />
+
+              <Select
+                placeholder="Age"
+                options={ageOptions}
+                value={ageRange}
+                onChange={setAgeRange}
+              />
+
+              <Select
+                placeholder="Group"
+                value={amount}
+                options={groupOptions}
+                onChange={setAmount}
+              />
+
+              <Select
+                placeholder="Language"
+                value={language}
+                options={languageOptions}
+                onChange={setLanguage}
+              />
+
+              <Select
+                placeholder="Day Status"
+                value={dayStatus}
+                options={dayStatusOptions}
+                onChange={setDayStatus}
+              />
+          </div>
+
+        </div>
+        <div className="facilitator-section">
+          <>
+            
+            <div className="behaviors-row">
+              <div className="facilitator-behaviors-container">
+                {confortBehaviors.map(behavior => {
+                  const { name } = behavior;
+                  return (
+                    <div
+                      key={name}
+                      className="facilitator-behaviors-item"
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                        className="confort-behavior-btn"
+                      >
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+                {reflectionBehaviors.map(behavior => {
+                  const { name } = behavior;
+                  return (
+                    <div
+                      key={name}
+                      className="facilitator-behaviors-item"
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                        className="reflection-behavior-btn"
+                      >
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+                {exhibitUseBehaviors.map(behavior => {
+                  const { name } = behavior;
+                  return (
+                    <div
+                      key={name}
+                      className="facilitator-behaviors-item"
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                        className="exhibitUse-behavior-btn"
+                      >
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+                {informationBehaviors.map(behavior => {
+                  const { name } = behavior;
+                  return (
+                    <div
+                      key={name}
+                      className="facilitator-behaviors-item"
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                        className="information-behavior-btn"
+                      >
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>        
+            </div>
+            <div className="selects-row">
+              <Select
+                placeholder="Gender"
+                options={genderOptions}
+                value={facilitatorGender}
+                onChange={setFacilitatorGender}
+              />
+
+              <Select
+                placeholder="Age"
+                options={ageOptions}
+                value={facilitatorAgeRange}
+                onChange={setFacilitatorAgeRange}
+              />
+
+            </div>
+          </>
+        </div>
+      </div>
+      <div className="bottom-half">
+      <div className="list-interactions-section">
           <div className="title-row">
             <h2>List of interactions</h2>
             
@@ -274,12 +445,14 @@ const CodingLive = () => {
         <div className="end-section">
           <div className="nextSteps">
             <button
+              className="end-live-buttons"
               onClick={onNewVisitorClicked}
               disabled={savingCoding}
             >
               new visitor
             </button>
             <button
+              className="end-live-buttons"
               onClick={onEndClicked}
               disabled={savingCoding}
             >
@@ -287,167 +460,7 @@ const CodingLive = () => {
             </button>
           </div>
         </div>
-      </div>
-      <div className="bottom-half">
-        <div className="visitor-section">
-          <div className="top-row">
-            <Select
-              placeholder="Gender"
-              options={genderOptions}
-              value={gender}
-              onChange={setGender}
-            />
-
-            <Select
-              placeholder="Age"
-              options={ageOptions}
-              value={ageRange}
-              onChange={setAgeRange}
-            />
-
-            <Select
-              placeholder="Group"
-              value={amount}
-              options={groupOptions}
-              onChange={setAmount}
-            />
-          </div>
-          <div className="bottom-row">
-            <div className="left-col">
-              <div className="visitor-row">
-                <input
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  type="text"
-                  placeholder="visitor description"
-                />
-              </div>
-              <div className="observation-row">
-                <input 
-                  value={observations}
-                  onChange={(e) => setObservations(e.target.value)}
-                  type="text"
-                  placeholder="observations"
-                />
-              </div>
-            </div>
-            <div className="right-col">
-              <div className="visitor-behaviors-container">
-                {visitorBehaviors.map(behavior => {
-                  const { name } = behavior;
-                  return (
-                    <div
-                      key={name}
-                      className="visitor-behaviors-item"
-                    >
-                      <button
-                        onClick={() => addBehaviorToCoding(behavior)}
-                      >
-                        {name}
-                      </button>
-                    </div>
-                  );
-                })}
-                <div className="visitor-behaviors-item">
-                  <button disabled={showFacilitator} onClick={handleFacilitatorInteraction}>
-                    Facilitator Interaction
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-        <div className="facilitator-section">
-          {showFacilitator && (
-            <>
-              <div className="top-row">
-                <Select
-                  placeholder="Gender"
-                  options={genderOptions}
-                  value={facilitatorGender}
-                  onChange={setFacilitatorGender}
-                />
-
-                <Select
-                  placeholder="Age"
-                  options={ageOptions}
-                  value={facilitatorAgeRange}
-                  onChange={setFacilitatorAgeRange}
-                />
-
-              </div>
-              <div className="bottom-row">
-                <div className="facilitator-behaviors-container">
-                  {confortBehaviors.map(behavior => {
-                    const { name } = behavior;
-                    return (
-                      <div
-                        key={name}
-                        className="facilitator-behaviors-item"
-                      >
-                        <button
-                          onClick={() => addBehaviorToCoding(behavior)}
-                          className="confort-behavior-btn"
-                        >
-                          {name}
-                        </button>
-                      </div>
-                    );
-                  })}
-                  {reflectionBehaviors.map(behavior => {
-                    const { name } = behavior;
-                    return (
-                      <div
-                        key={name}
-                        className="facilitator-behaviors-item"
-                      >
-                        <button
-                          onClick={() => addBehaviorToCoding(behavior)}
-                          className="reflection-behavior-btn"
-                        >
-                          {name}
-                        </button>
-                      </div>
-                    );
-                  })}
-                  {exhibitUseBehaviors.map(behavior => {
-                    const { name } = behavior;
-                    return (
-                      <div
-                        key={name}
-                        className="facilitator-behaviors-item"
-                      >
-                        <button
-                          onClick={() => addBehaviorToCoding(behavior)}
-                          className="exhibitUse-behavior-btn"
-                        >
-                          {name}
-                        </button>
-                      </div>
-                    );
-                  })}
-                  {informationBehaviors.map(behavior => {
-                    const { name } = behavior;
-                    return (
-                      <div
-                        key={name}
-                        className="facilitator-behaviors-item"
-                      >
-                        <button
-                          onClick={() => addBehaviorToCoding(behavior)}
-                          className="information-behavior-btn"
-                        >
-                          {name}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>        
-              </div>
-            </>
-          )}
-        </div>
+        
       </div>
     </div>
   );

@@ -16,6 +16,8 @@ const CodingVideoNew = () => {
     if (selected) {
       dispatch(loadExhibitInfo(selected.id));
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleVideoSelect = (video) => {  

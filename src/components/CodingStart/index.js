@@ -34,6 +34,8 @@ const CodingStart = () => {
   // componentDidMount
   useEffect(() => {
     dispatch(loadExhibits());
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

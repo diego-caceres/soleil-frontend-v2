@@ -8,7 +8,7 @@ import Select from 'react-select';
 import { loadBehaviorsForFacilitator, loadBehaviorsForVisitor } from 'src/redux/behaviors'
 import { saveCoding } from 'src/redux/codings';
 import { toHHMMSS } from 'src/utils';
-import { genderOptions, ageOptions, groupOptions } from 'src/constants';
+import { genderOptions, ageOptions, groupOptions, languageOptions, dayStatusOptions } from 'src/constants';
 
 const CodingVideo = () => {
   const navigate = useNavigate();
@@ -22,9 +22,9 @@ const CodingVideo = () => {
   const [ageRange, setAgeRange] = useState(null);
   const [amount, setAmount] = useState(null);
   const [description, setDescription] = useState('');
-  const [language, setLanguage] = useState('Spanish');
+  const [language, setLanguage] = useState({ value: 'spanish', label: 'Spanish' });
 
-  const [dayStatus, setDayStatus] = useState('Not Busy');
+  const [dayStatus, setDayStatus] = useState({ value: 'nonBusyDat', label: 'Non busy day' });
   const [observations, setObservations] = useState('');
 
   const [facilitatorGender, setFacilitatorGender] = useState(null);
@@ -44,6 +44,8 @@ const CodingVideo = () => {
   useEffect(() => {
     dispatch(loadBehaviorsForFacilitator());
     dispatch(loadBehaviorsForVisitor());
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (visitorBehaviors.length === 0 || facilitatorBehaviors.length === 0) {
@@ -73,14 +75,10 @@ const CodingVideo = () => {
     setShowFacilitator(false);
     setFacilitatorGender(null);
     setFacilitatorAgeRange(null);
-    setCodingBehaviors('');
+    setCodingBehaviors([]);
 
     setVideoName('');
     setVideoURL('');
-  }
-
-  const handleFacilitatorInteraction = () => {
-    setShowFacilitator(true);
   }
 
   const addBehaviorToCoding = (behavior) => {
@@ -88,15 +86,21 @@ const CodingVideo = () => {
     let newList = [
       ...codingBehaviors,
     ]
+
+    if (behavior.forFacilitator && !showFacilitator) {
+      // On the first Facilitator Behavior, we turn the flag on for validations
+      setShowFacilitator(true);
+    }
   
-    // If it is the same as the last behavior added, it is the end time
-    const behaviorsOfSameType = codingBehaviors.filter(c => c.forVisitor === behavior.forVisitor);
-    const lastBehavior = behaviorsOfSameType.length > 0 ? behaviorsOfSameType[0] : null;
-    if (lastBehavior && lastBehavior.id === behavior.id) {
+    // If this behavior was added before, with no end time, it is the end time
+    // Photo is instant
+    const behaviorsOfSameId = codingBehaviors.filter(c => c.id === behavior.id && c.name !== 'Photo');
+    const lastBehavior = behaviorsOfSameId.length > 0 ? behaviorsOfSameId[0] : null;
+    if (lastBehavior && !lastBehavior.timeEnded) {
       // Add End Time
       const index = newList.findIndex(cb => cb.id === lastBehavior.id);
       newList[index].timeEnded = seconds;
-    } 
+    }    
     else {
       // New Behavior at the beginning of the list
       const codingBehavior = {
@@ -178,13 +182,13 @@ const CodingVideo = () => {
       evaluatorId: currentEvaluator.id,
       evaluatorName: `${currentEvaluator?.name} ${currentEvaluator?.lastName}`,
       extraObservations: observations,
-      dayStatus: dayStatus,
+      dayStatus: dayStatus.value,
       visitor: {
         gender: gender.value,
         ageRange: ageRange.value,        
         typeOfGroup: amount.value,
         description: description,
-        language: language,
+        language: language.value,
       },
       showFacilitator: showFacilitator,
       facilitator: {
@@ -277,12 +281,14 @@ const CodingVideo = () => {
           </div>
           <div className="nextSteps">
             <button
+              className="end-buttons"
               onClick={onNewVisitorClicked}
               disabled={savingCoding}
             >
               new visitor
             </button>
             <button
+              className="end-buttons"
               onClick={onEndClicked}
               disabled={savingCoding}
             >
@@ -314,6 +320,20 @@ const CodingVideo = () => {
               value={amount}
               options={groupOptions}
               onChange={setAmount}
+            />
+
+            <Select
+              placeholder="Language"
+              value={language}
+              options={languageOptions}
+              onChange={setLanguage}
+            />
+
+            <Select
+              placeholder="Day Status"
+              value={dayStatus}
+              options={dayStatusOptions}
+              onChange={setDayStatus}
             />
           </div>
           <div className="bottom-row">
@@ -351,105 +371,98 @@ const CodingVideo = () => {
                       </button>
                     </div>
                   );
-                })}
-                <div className="visitor-behaviors-item">
-                  <button disabled={showFacilitator} onClick={handleFacilitatorInteraction}>
-                    Facilitator Interaction
-                  </button>
-                </div>
+                })}                
               </div>
             </div>
           </div>
         </div>
         <div className="facilitator-section">
-          {showFacilitator && (
-            <>
-              <div className="top-row">
-                <Select
-                  placeholder="Gender"
-                  options={genderOptions}
-                  value={facilitatorGender}
-                  onChange={setFacilitatorGender}
-                />
+          <>
+            <div className="top-row">
+              <Select
+                placeholder="Gender"
+                options={genderOptions}
+                value={facilitatorGender}
+                onChange={setFacilitatorGender}
+              />
 
-                <Select
-                  placeholder="Age"
-                  options={ageOptions}
-                  value={facilitatorAgeRange}
-                  onChange={setFacilitatorAgeRange}
-                />
+              <Select
+                placeholder="Age"
+                options={ageOptions}
+                value={facilitatorAgeRange}
+                onChange={setFacilitatorAgeRange}
+              />
 
-              </div>
-              <div className="bottom-row">
-                <div className="facilitator-behaviors-container">
-                  {confortBehaviors.map(behavior => {
-                    const { name } = behavior;
-                    return (
-                      <div
-                        key={name}
-                        className="facilitator-behaviors-item"
+            </div>
+            <div className="bottom-row">
+              <div className="facilitator-behaviors-container">
+                {confortBehaviors.map(behavior => {
+                  const { name } = behavior;
+                  return (
+                    <div
+                      key={name}
+                      className="facilitator-behaviors-item"
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                        className="confort-behavior-btn"
                       >
-                        <button
-                          onClick={() => addBehaviorToCoding(behavior)}
-                          className="confort-behavior-btn"
-                        >
-                          {name}
-                        </button>
-                      </div>
-                    );
-                  })}
-                  {reflectionBehaviors.map(behavior => {
-                    const { name } = behavior;
-                    return (
-                      <div
-                        key={name}
-                        className="facilitator-behaviors-item"
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+                {reflectionBehaviors.map(behavior => {
+                  const { name } = behavior;
+                  return (
+                    <div
+                      key={name}
+                      className="facilitator-behaviors-item"
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                        className="reflection-behavior-btn"
                       >
-                        <button
-                          onClick={() => addBehaviorToCoding(behavior)}
-                          className="reflection-behavior-btn"
-                        >
-                          {name}
-                        </button>
-                      </div>
-                    );
-                  })}
-                  {exhibitUseBehaviors.map(behavior => {
-                    const { name } = behavior;
-                    return (
-                      <div
-                        key={name}
-                        className="facilitator-behaviors-item"
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+                {exhibitUseBehaviors.map(behavior => {
+                  const { name } = behavior;
+                  return (
+                    <div
+                      key={name}
+                      className="facilitator-behaviors-item"
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                        className="exhibitUse-behavior-btn"
                       >
-                        <button
-                          onClick={() => addBehaviorToCoding(behavior)}
-                          className="exhibitUse-behavior-btn"
-                        >
-                          {name}
-                        </button>
-                      </div>
-                    );
-                  })}
-                  {informationBehaviors.map(behavior => {
-                    const { name } = behavior;
-                    return (
-                      <div
-                        key={name}
-                        className="facilitator-behaviors-item"
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+                {informationBehaviors.map(behavior => {
+                  const { name } = behavior;
+                  return (
+                    <div
+                      key={name}
+                      className="facilitator-behaviors-item"
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                        className="information-behavior-btn"
                       >
-                        <button
-                          onClick={() => addBehaviorToCoding(behavior)}
-                          className="information-behavior-btn"
-                        >
-                          {name}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>        
-              </div>
-            </>
-          )}
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>        
+            </div>
+          </>
         </div>       
       </div>
       

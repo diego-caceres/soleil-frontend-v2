@@ -1,7 +1,6 @@
 
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import CodingStart from './components/CodingStart';
-import CodingVideoNew from './components/CodingVideoNew';
 import CodingVideo from './components/CodingVideo';
 import CodingLive from './components/CodingLive';
 

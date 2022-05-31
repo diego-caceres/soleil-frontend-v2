@@ -40,11 +40,11 @@ export const saveCoding = (codingToSave, callback) => {
     .then(coding => {
       if (coding.id) {
         if (callback) {
-          callback('El coding se guardó con éxito', true);
+          callback('The coding was saved successfully', true);
         }
       } else {
         if (callback) {
-          callback('Ocurrió un error: ' + coding.message, false);
+          callback('There was an error: ' + coding.message, false);
         }
       }
     })
