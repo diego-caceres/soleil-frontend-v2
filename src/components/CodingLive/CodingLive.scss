@@ -6,7 +6,8 @@
 	// background-repeat: no-repeat;
   // background-size: cover;
   background-color: #b36b55;
-	width: 100%;
+  width: 100%;
+  height: 105%;
   
   display: flex;
   flex-direction: column;
@@ -78,7 +79,11 @@
             height: 100%;
             border-radius: 6px;
           }
-        }          
+        }
+        
+        .behavior-item-selected {
+          background-color: #0d6101;
+        }
       }
 
       .second-row {
@@ -167,6 +172,10 @@
           .information-behavior-btn {
             background-color: purple;
           }
+        }
+
+        .behavior-item-selected {
+          background-color: #0d6101;
         }
       }
 

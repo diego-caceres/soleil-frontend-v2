@@ -229,6 +229,8 @@ const CodingVideo = () => {
     }
   }
 
+  const visitorBehaviorsOpen = codingBehaviors.filter(c => c.forVisitor && !c.timeEnded && c.name !== 'Photo');
+  const facilitatorBehaviorsOpen = codingBehaviors.filter(c => c.forFacilitator && !c.timeEnded && c.name !== 'Photo');
   return (
     <div className="video-coding-container">
       <div className="header-row">Video Coding!! | Exhibit: {selected.name} | Evaluator: {`${currentEvaluator.name} ${currentEvaluator.lastName}`} | <a href='/'>Go Back</a></div>      
@@ -358,11 +360,12 @@ const CodingVideo = () => {
             <div className="right-col">
               <div className="visitor-behaviors-container">
                 {visitorBehaviors.map(behavior => {
-                  const { name } = behavior;
+                  const { id, name } = behavior;
+                  const selectedClass = visitorBehaviorsOpen.find(vb => vb.id === id) ? 'behavior-item-selected' : '';
                   return (
                     <div
                       key={name}
-                      className="visitor-behaviors-item"
+                      className={`visitor-behaviors-item ${selectedClass}`}
                     >
                       <button
                         onClick={() => addBehaviorToCoding(behavior)}
@@ -397,11 +400,12 @@ const CodingVideo = () => {
             <div className="bottom-row">
               <div className="facilitator-behaviors-container">
                 {confortBehaviors.map(behavior => {
-                  const { name } = behavior;
+                  const { id, name } = behavior;
+                  const selectedClass = facilitatorBehaviorsOpen.find(vb => vb.id === id)  ? 'behavior-item-selected' : '';
                   return (
                     <div
                       key={name}
-                      className="facilitator-behaviors-item"
+                      className={`facilitator-behaviors-item ${selectedClass}`}
                     >
                       <button
                         onClick={() => addBehaviorToCoding(behavior)}
@@ -413,11 +417,13 @@ const CodingVideo = () => {
                   );
                 })}
                 {reflectionBehaviors.map(behavior => {
-                  const { name } = behavior;
+                  const { id, name } = behavior;
+                  const selectedClass = facilitatorBehaviorsOpen.find(vb => vb.id === id) ? 'behavior-item-selected' : '';
+                  
                   return (
                     <div
                       key={name}
-                      className="facilitator-behaviors-item"
+                      className={`facilitator-behaviors-item ${selectedClass}`}
                     >
                       <button
                         onClick={() => addBehaviorToCoding(behavior)}
@@ -429,11 +435,13 @@ const CodingVideo = () => {
                   );
                 })}
                 {exhibitUseBehaviors.map(behavior => {
-                  const { name } = behavior;
+                  const { id, name } = behavior;
+                  const selectedClass = facilitatorBehaviorsOpen.find(vb => vb.id === id) ? 'behavior-item-selected' : '';
+                  
                   return (
                     <div
                       key={name}
-                      className="facilitator-behaviors-item"
+                      className={`facilitator-behaviors-item ${selectedClass}`}
                     >
                       <button
                         onClick={() => addBehaviorToCoding(behavior)}
@@ -445,11 +453,13 @@ const CodingVideo = () => {
                   );
                 })}
                 {informationBehaviors.map(behavior => {
-                  const { name } = behavior;
+                  const { id, name } = behavior;
+                  const selectedClass = facilitatorBehaviorsOpen.find(vb => vb.id === id) ? 'behavior-item-selected' : '';
+                  
                   return (
                     <div
                       key={name}
-                      className="facilitator-behaviors-item"
+                      className={`facilitator-behaviors-item ${selectedClass}`}
                     >
                       <button
                         onClick={() => addBehaviorToCoding(behavior)}
