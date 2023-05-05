@@ -1,21 +1,46 @@
+// import { useEffect, useState } from "react";
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import CodingStart from './components/CodingStart';
-import CodingVideo from './components/CodingVideo';
-import CodingLive from './components/CodingLive';
+import { Router } from "./components/Router";
 
-const BASE_PATH = '';
+// import { db } from "./config/firebase";
+// import { getDocs, collection } from "firebase/firestore";
 
 function App() {
+  // const [movies, setMovies] = useState([]);
+
+  // const moviesCollectionRef = collection(db, "movies");
+
+  // useEffect(() => {
+  //   const getMoviesList = async () => {
+  //     try {
+  //       const data = await getDocs(moviesCollectionRef);
+  //       const filteredData = data.docs.map((doc) => ({
+  //         id: doc.id,
+  //         ...doc.data(),
+  //       }));
+  //       console.log("filteredData", filteredData);
+  //       setMovies(filteredData);
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+
+  //   getMoviesList();
+  // }, []);
 
   return (
-    <BrowserRouter basePath={BASE_PATH}>
-      <Routes>
-        <Route path={`${BASE_PATH}/`} element={<CodingStart />} />
-        <Route path={`${BASE_PATH}/coding-video`} element={<CodingVideo />} />
-        <Route path={`${BASE_PATH}/new-coding-live`} element={<CodingLive />} />
-      </Routes>
-    </BrowserRouter>
+    <div className="App">
+      <Router />
+
+      {/* <div>
+        {movies.map(movie => (
+          <div key={movie.id}>
+            <h2 style={{ color: movie.receivedAnOscar ? 'green' : 'red' }}>{movie.title}</h2>
+            <p>Date: {movie.releaseDate}</p>
+          </div>
+        ))}
+      </div>*/}
+    </div>
   );
 }
 

@@ -1,97 +1,90 @@
-import { createSlice } from '@reduxjs/toolkit'
-import { baseUrl } from 'src/constants';
+import { createSlice } from "@reduxjs/toolkit";
+import { baseUrl } from "src/constants";
+
+import { db } from "../config/firebase";
+import { getDocs, collection } from "firebase/firestore";
 
 const initialState = {
   list: [],
-  selected: null,
-  evaluators: [],
+  selectedExhibit: null,
   currentEvaluator: null,
   currentExhibitVideos: [],
   currentExhibitCodings: [],
   selectedVideo: null,
-}
+};
 
 export const exhibitsSlice = createSlice({
-  name: 'exhibits',
+  name: "exhibits",
   initialState,
   reducers: {
     setExhibitList: (state, action) => {
       const { exhibits } = action.payload;
-      state.list = exhibits
+      state.list = exhibits;
     },
     selectExhibit: (state, action) => {
       const { exhibit } = action.payload;
-      state.selected = exhibit
+      state.selectedExhibit = exhibit;
     },
-    setEvaluatorsList: (state, action) => {
-      const { evaluators } = action.payload;
-      state.evaluators = evaluators
-    },
-    selectEvaluator: (state, action) => {
-      const { evaluator } = action.payload;
-      state.currentEvaluator = evaluator
+    setEvaluator: (state, action) => {
+      const evaluator = action.payload;
+      state.currentEvaluator = evaluator;
     },
     setCurrentExhibitVideosList: (state, action) => {
       const { exhibitVideos } = action.payload;
-      state.currentExhibitVideos = exhibitVideos
+      state.currentExhibitVideos = exhibitVideos;
     },
     selectVideo: (state, action) => {
       const { video } = action.payload;
-      state.selectedVideo = video
+      state.selectedVideo = video;
     },
   },
-})
+});
 
 // Action creators are generated for each case reducer function
 export const {
   setExhibitList,
   selectExhibit,
-  setEvaluatorsList,
-  selectEvaluator,
+  setEvaluator,
   setCurrentExhibitVideosList,
-  selectVideo
-} = exhibitsSlice.actions
+  selectVideo,
+} = exhibitsSlice.actions;
 
-export default exhibitsSlice.reducer
+export default exhibitsSlice.reducer;
 
 export const loadExhibits = () => {
-  return (dispatch) => {
-    fetch(`${baseUrl}/exhibits`, {
-      method: 'GET'
-    })
-    .then(response => response.json())
-    .then(exhibits => {
-      if (exhibits.length) {
-        dispatch(setExhibitList({ exhibits: exhibits }));
-      }
-    });
-  };
-};
+  return async (dispatch) => {
+    const exhibitsCollectionRef = collection(db, "exhibits");
+    const data = await getDocs(exhibitsCollectionRef);
+    const filteredData = data.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    dispatch(setExhibitList({ exhibits: filteredData }));
 
-export const loadEvaluators = (center) => {
-  return (dispatch) => {
-    fetch(`${baseUrl}/evaluators?center=${center}`, {
-      method: 'GET'
-    })
-    .then(response => response.json())
-    .then(evaluators => {
-      if (evaluators.length) {
-        dispatch(setEvaluatorsList({ evaluators: evaluators }));
-      }
-    });
+    // fetch(`${baseUrl}/exhibits`, {
+    //   method: 'GET'
+    // })
+    // .then(response => response.json())
+    // .then(exhibits => {
+    //   if (exhibits.length) {
+    //     dispatch(setExhibitList({ exhibits: exhibits }));
+    //   }
+    // });
   };
 };
 
 export const loadExhibitInfo = (exhibitId) => {
   return (dispatch) => {
     fetch(`${baseUrl}/exhibitvideos?exhibitId=${exhibitId}`, {
-      method: 'GET'
+      method: "GET",
     })
-    .then(response => response.json())
-    .then(exhibitVideos => {
-      if (exhibitVideos.length) {
-        dispatch(setCurrentExhibitVideosList({ exhibitVideos: exhibitVideos }));
-      }
-    });
+      .then((response) => response.json())
+      .then((exhibitVideos) => {
+        if (exhibitVideos.length) {
+          dispatch(
+            setCurrentExhibitVideosList({ exhibitVideos: exhibitVideos })
+          );
+        }
+      });
   };
-}
+};

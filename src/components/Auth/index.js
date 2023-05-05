@@ -1,0 +1,92 @@
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+
+import { auth } from "../../config/firebase";
+import { setEvaluator } from "src/redux/exhibits";
+
+import { createExibits } from "src/seeds/exhibits";
+import { createBehaviors } from "src/seeds/behaviors";
+
+import "./auth.css";
+
+export const Auth = () => {
+  const dispatch = useDispatch();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  console.log("Current User:", auth?.currentUser?.email);
+
+  const handleSignIn = async () => {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleLoginIn = async () => {
+    setError("");
+    try {
+      const { user } = await signInWithEmailAndPassword(auth, email, password);
+      const displayName = user.displayName || user.email;
+
+      dispatch(
+        setEvaluator({
+          name: displayName,
+          id: user.uid,
+        })
+      );
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    }
+  };
+
+  return (
+    <div className="loginWrapper">
+      <h1>Soleil</h1>
+      <input
+        type="text"
+        placeholder="Email.."
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="Password.."
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      {/* <button onClick={handleSignIn}>Sign In</button> */}
+
+      <button onClick={handleLoginIn}>Login</button>
+
+      <div className="errorWrapper">{error && <p>{error}</p>}</div>
+
+      {/* <SeedComponent /> */}
+    </div>
+  );
+};
+
+const SeedComponent = () => {
+  const handleExhibitsCreation = async () => {
+    await createExibits();
+  };
+
+  const handleBehaviorsCreation = async () => {
+    await createBehaviors();
+  };
+
+  return (
+    <div>
+      <button onClick={handleExhibitsCreation}>Create Exhibits</button>
+      <button onClick={handleBehaviorsCreation}>Create Behaviors</button>
+    </div>
+  );
+};
