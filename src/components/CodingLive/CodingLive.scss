@@ -16,13 +16,6 @@
     font-size: 13px;
   }
 
-  .header-row {
-    background-color: #daa520b3;
-    color: white;
-    padding: 5px 10px;
-    font-weight: bold;
-  }
-
   .top-half {
     flex: 1;
     display: flex;
@@ -33,9 +26,10 @@
       padding: 15px 10px;
       display: flex;
       flex-direction: column;
-      background-color: #e3ad86;
+      background-color: #666D77;
       border-radius: 20px;
       margin: 10px;
+      
 
       // .top-row {
       //   display: flex;
