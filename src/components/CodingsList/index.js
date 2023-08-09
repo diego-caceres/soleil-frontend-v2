@@ -4,8 +4,7 @@ import { getDocs, collection } from "firebase/firestore";
 
 import "./CodingsList.scss";
 
-const getDateStringFromTimestapm = (timestamp) => {
-  debugger;
+const getDateStringFromTimestamp = (timestamp) => {
   const date = new Date(timestamp.seconds * 1000);
 
   return `${date.toDateString()} ${date.toLocaleTimeString()}`;
@@ -43,7 +42,7 @@ const CodingsList = () => {
                   key={coding.codedDate}
                   onClick={() => setSelectedCoding(coding)}
                 >
-                  {`Tipo: ${codingType} - Fecha ${getDateStringFromTimestapm(
+                  {`Tipo: ${codingType} - Fecha ${getDateStringFromTimestamp(
                     codedDate
                   )}`}
                 </li>
@@ -67,6 +66,7 @@ const CodingsList = () => {
 
 const Coding = ({ coding }) => {
   const {
+    id: codingId,
     codingType,
     codedDate,
     dayStatus,
@@ -79,7 +79,7 @@ const Coding = ({ coding }) => {
   return (
     <>
       <h2>Tipo: {codingType}</h2>
-      <h3>Fecha: {`${getDateStringFromTimestapm(codedDate)}`}</h3>
+      <h3>Fecha: {`${getDateStringFromTimestamp(codedDate)}`}</h3>
       <p>
         <b>Estado del día:</b> {dayStatus}
       </p>
@@ -94,12 +94,18 @@ const Coding = ({ coding }) => {
       </p>
       <h3>Comportamientos:</h3>
       <ul>
-        {codingBehaviors.map((behavior) => {
-          const { id, forFaciltator, name, type, timeEnded, timeMarked } =
-            behavior;
+        {codingBehaviors.map((behavior, index) => {
+          const {
+            id: behaviorId,
+            forFacilitator,
+            name,
+            type,
+            timeEnded,
+            timeMarked,
+          } = behavior;
           return (
-            <li key={id}>
-              <p>{forFaciltator ? "Facilitador:" : "Visitor"}</p>
+            <li key={`${codingId}-${behaviorId}-${index}`}>
+              <p>{forFacilitator ? "Facilitador:" : "Visitor"}</p>
               <p>Nombre: {name}</p>
               <p>Tipo: {type}</p>
               <p>Tiempo marcado: {timeMarked}</p>

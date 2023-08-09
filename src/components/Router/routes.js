@@ -4,6 +4,7 @@ import CodingStart from "../CodingStart";
 import CodingVideo from "../CodingVideo";
 import CodingLive from "../CodingLive";
 import CodingsList from "../CodingsList";
+import InterCoder from "../InterCoder";
 
 const BASE_PATH = "";
 
@@ -15,6 +16,7 @@ export const AppRoutes = () => {
         <Route path={`${BASE_PATH}/coding-video`} element={<CodingVideo />} />
         <Route path={`${BASE_PATH}/new-coding-live`} element={<CodingLive />} />
         <Route path={`${BASE_PATH}/codings`} element={<CodingsList />} />
+        <Route path={`${BASE_PATH}/inter-coder`} element={<InterCoder />} />
       </Routes>
     </BrowserRouter>
   );

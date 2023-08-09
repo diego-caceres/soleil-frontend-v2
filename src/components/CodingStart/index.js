@@ -15,6 +15,12 @@ const CodingStart = () => {
   return (
     <div className="container-start">
       <p style={{ color: "#FFF" }}>Coder: {displayName}</p>
+      <Link to="/inter-coder">
+        <div>Inter Coder Reliability</div>
+      </Link>
+      <Link to="/codings">
+        <div>Codings List</div>
+      </Link>
       <SelectExhibit />
       <div className="coding-buttons-container">
         <Link to={selectedExhibit ? "/new-coding-live" : ""}>
