@@ -1,14 +1,8 @@
 import { useState, useEffect } from "react";
 import { db } from "../../config/firebase";
 import { getDocs, collection } from "firebase/firestore";
-
+import { getDateStringFromTimestamp } from "src/utils";
 import "./CodingsList.scss";
-
-const getDateStringFromTimestamp = (timestamp) => {
-  const date = new Date(timestamp.seconds * 1000);
-
-  return `${date.toDateString()} ${date.toLocaleTimeString()}`;
-};
 
 const CodingsList = () => {
   const [codings, setCodings] = useState([]);
