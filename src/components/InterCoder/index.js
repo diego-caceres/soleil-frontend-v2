@@ -60,6 +60,8 @@ function InterCoder() {
       (coding) => coding.id === selectedCodingId
     );
     setCodingA(selectedCoding);
+    setInterCoderReliability(null);
+    setInterCoderReliabilityITE(null);
   };
 
   const handleCodingBSelect = (event) => {
@@ -68,6 +70,8 @@ function InterCoder() {
       (coding) => coding.id === selectedCodingId
     );
     setCodingB(selectedCoding);
+    setInterCoderReliability(null);
+    setInterCoderReliabilityITE(null);
   };
 
   const isCalculateButtonEnabled = codingA && codingB;
@@ -257,7 +261,10 @@ function InterCoder() {
               </div>
 
               <div>
-                <h3>Intercoder Similarity ITE: {interCoderReliabilityITE}%</h3>
+                <h3>
+                  Intercoder Similarity ITE (Ignore Time Ended):{" "}
+                  {interCoderReliabilityITE}%
+                </h3>
               </div>
 
               {renderCodingBehaviorsComparison()}
