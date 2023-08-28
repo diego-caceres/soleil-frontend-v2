@@ -5,6 +5,7 @@ import CodingVideo from "../CodingVideo";
 import CodingLive from "../CodingLive";
 import CodingsList from "../CodingsList";
 import InterCoder from "../InterCoder";
+import EngagementChart from "../EngagementChart";
 
 const BASE_PATH = "";
 
@@ -17,6 +18,7 @@ export const AppRoutes = () => {
         <Route path={`${BASE_PATH}/new-coding-live`} element={<CodingLive />} />
         <Route path={`${BASE_PATH}/codings`} element={<CodingsList />} />
         <Route path={`${BASE_PATH}/inter-coder`} element={<InterCoder />} />
+        <Route path={`${BASE_PATH}/grafica`} element={<EngagementChart />} />
       </Routes>
     </BrowserRouter>
   );

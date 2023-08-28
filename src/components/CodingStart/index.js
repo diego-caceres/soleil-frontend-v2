@@ -21,6 +21,9 @@ const CodingStart = () => {
       <Link to="/codings">
         <div>Codings List</div>
       </Link>
+      <Link to="/grafica">
+        <div>Grafica Engagement</div>
+      </Link>
       <SelectExhibit />
       <div className="coding-buttons-container">
         <Link to={selectedExhibit ? "/new-coding-live" : ""}>
