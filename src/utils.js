@@ -42,25 +42,34 @@ export const calculateSimilarity = (
   return 0; // Behaviors are not similar
 };
 
-export const calculateIntercoderSimilarity = (
-  codingA,
-  codingB,
-  deltaTime,
-  ignoreTimeEnded = false
-) => {
+export const calculateIntercoderSimilarity = (codingA, codingB) => {
   debugger;
-  const totalBehaviorsA = codingA.codingBehaviors.length;
-  const totalBehaviorsB = codingB.codingBehaviors.length;
+
+  let behaviorANames = [];
+  let codingABehaviorsFiltered = codingA.codingBehaviors.map((behavior) => {
+    if (!behaviorANames.includes(behavior.name)) {
+      behaviorANames.push(behavior.name);
+      return true;
+    }
+    return false;
+  });
+
+  let behaviorBNames = [];
+  let codingBBehaviorsFiltered = codingB.codingBehaviors.map((behavior) => {
+    if (!behaviorBNames.includes(behavior.name)) {
+      behaviorBNames.push(behavior.name);
+      return true;
+    }
+    return false;
+  });
+
+  const totalBehaviorsA = codingABehaviorsFiltered.length;
+  const totalBehaviorsB = codingBBehaviorsFiltered.length;
   let totalSimilarity = 0;
 
-  for (const behaviorA of codingA.codingBehaviors) {
-    for (const behaviorB of codingB.codingBehaviors) {
-      totalSimilarity += calculateSimilarity(
-        behaviorA,
-        behaviorB,
-        deltaTime,
-        ignoreTimeEnded
-      );
+  for (const behaviorA of codingABehaviorsFiltered) {
+    if (codingBBehaviorsFiltered.some((cb) => cb.name === behaviorA.name)) {
+      totalSimilarity += 1;
     }
   }
 
@@ -69,6 +78,34 @@ export const calculateIntercoderSimilarity = (
 
   return parseFloat(intercoderSimilarity.toFixed(2));
 };
+
+// export const calculateIntercoderSimilarity = (
+//   codingA,
+//   codingB,
+//   deltaTime,
+//   ignoreTimeEnded = false
+// ) => {
+//   debugger;
+//   const totalBehaviorsA = codingA.codingBehaviors.length;
+//   const totalBehaviorsB = codingB.codingBehaviors.length;
+//   let totalSimilarity = 0;
+
+//   for (const behaviorA of codingA.codingBehaviors) {
+//     for (const behaviorB of codingB.codingBehaviors) {
+//       totalSimilarity += calculateSimilarity(
+//         behaviorA,
+//         behaviorB,
+//         deltaTime,
+//         ignoreTimeEnded
+//       );
+//     }
+//   }
+
+//   const intercoderSimilarity =
+//     (totalSimilarity * 100) / Math.max(totalBehaviorsA, totalBehaviorsB);
+
+//   return parseFloat(intercoderSimilarity.toFixed(2));
+// };
 
 export const isSimilar = (behavior, behaviorList, deltaTime) => {
   for (const otherBehavior of behaviorList) {

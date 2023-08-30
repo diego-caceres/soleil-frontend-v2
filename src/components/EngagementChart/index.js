@@ -44,11 +44,27 @@ function EngagementChart() {
   // Calculate aggregated engagement data per visitor grouping
   const aggregateEngagementData = () => {
     const groupedEngagementData = {};
+    const groupedEngagementData2 = {
+      initiation: {
+        group: "initiaton",
+        value: 60,
+      },
+      transition: {
+        group: "transition",
+        value: 15,
+      },
+      breaktrough: {
+        group: "breaktrough",
+        value: 25,
+      },
+    };
+
+    // let codingsFemale = codings.filter((c) => c.visitor.gender === "female");
 
     for (const coding of codings) {
       const { ageRange, gender, typeOfGroup } = coding.visitor;
       const engagementLevel = calculateEngagementLevel(coding.codingBehaviors);
-      debugger;
+
       const visitorGroup = `${ageRange}-${gender}-${typeOfGroup}`;
       if (!groupedEngagementData[visitorGroup]) {
         groupedEngagementData[visitorGroup] = {
@@ -68,7 +84,14 @@ function EngagementChart() {
     const filteredEngagementData = Object.values(groupedEngagementData).filter(
       (group) => group.value > 0
     );
-    return filteredEngagementData;
+
+    console.log("engagementChartData 1", filteredEngagementData);
+    console.log("engagementChartData 2 ", groupedEngagementData2);
+
+    const filteredEngagementData2 = Object.values(groupedEngagementData2);
+
+    return filteredEngagementData2;
+    // return groupedEngagementData2;
 
     // Calculate average engagement level
     // for (const group of Object.keys(groupedEngagementData)) {
@@ -87,7 +110,6 @@ function EngagementChart() {
   // Example: { id: 'Male', group: 'Gender', value: 3 }
   // This indicates that visitors with 'Male' gender reached an engagement level of 3 on average
   const engagementChartData = aggregateEngagementData();
-  console.log("engagementChartData", engagementChartData);
 
   return (
     <div>

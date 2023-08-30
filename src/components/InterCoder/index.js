@@ -236,14 +236,14 @@ function InterCoder() {
             </select>
           </div>
 
-          <div>
+          {/* <div>
             <label>Delta Time:</label>
             <input
               type="number"
               value={deltaTime}
               onChange={(event) => setDeltaTime(event.target.value)}
             />
-          </div>
+          </div> */}
 
           <div>
             <button
@@ -260,12 +260,12 @@ function InterCoder() {
                 <h3>Intercoder Similarity: {interCoderReliability}%</h3>
               </div>
 
-              <div>
+              {/* <div>
                 <h3>
                   Intercoder Similarity ITE (Ignore Time Ended):{" "}
                   {interCoderReliabilityITE}%
                 </h3>
-              </div>
+              </div> */}
 
               {renderCodingBehaviorsComparison()}
 
