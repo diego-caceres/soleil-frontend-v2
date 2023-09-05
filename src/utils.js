@@ -46,7 +46,7 @@ export const calculateIntercoderSimilarity = (codingA, codingB) => {
   debugger;
 
   let behaviorANames = [];
-  let codingABehaviorsFiltered = codingA.codingBehaviors.map((behavior) => {
+  let codingABehaviorsFiltered = codingA.codingBehaviors.filter((behavior) => {
     if (!behaviorANames.includes(behavior.name)) {
       behaviorANames.push(behavior.name);
       return true;
@@ -55,7 +55,7 @@ export const calculateIntercoderSimilarity = (codingA, codingB) => {
   });
 
   let behaviorBNames = [];
-  let codingBBehaviorsFiltered = codingB.codingBehaviors.map((behavior) => {
+  let codingBBehaviorsFiltered = codingB.codingBehaviors.filter((behavior) => {
     if (!behaviorBNames.includes(behavior.name)) {
       behaviorBNames.push(behavior.name);
       return true;
@@ -63,8 +63,10 @@ export const calculateIntercoderSimilarity = (codingA, codingB) => {
     return false;
   });
 
-  const totalBehaviorsA = codingABehaviorsFiltered.length;
-  const totalBehaviorsB = codingBBehaviorsFiltered.length;
+  const totalBehaviorsPosible = [
+    ...behaviorANames,
+    ...behaviorBNames.filter((b) => !behaviorANames.includes(b)),
+  ].length;
   let totalSimilarity = 0;
 
   for (const behaviorA of codingABehaviorsFiltered) {
@@ -73,8 +75,7 @@ export const calculateIntercoderSimilarity = (codingA, codingB) => {
     }
   }
 
-  const intercoderSimilarity =
-    (totalSimilarity * 100) / Math.max(totalBehaviorsA, totalBehaviorsB);
+  const intercoderSimilarity = (totalSimilarity * 100) / totalBehaviorsPosible;
 
   return parseFloat(intercoderSimilarity.toFixed(2));
 };
@@ -106,6 +107,13 @@ export const calculateIntercoderSimilarity = (codingA, codingB) => {
 
 //   return parseFloat(intercoderSimilarity.toFixed(2));
 // };
+
+export const isInBoth = (behavior, behaviorsA, behaviorsB) => {
+  if (behaviorsA.includes(behavior) && behaviorsB.includes(behavior)) {
+    return true;
+  }
+  return false;
+};
 
 export const isSimilar = (behavior, behaviorList, deltaTime) => {
   for (const otherBehavior of behaviorList) {

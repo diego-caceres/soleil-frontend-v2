@@ -9,7 +9,7 @@ import Select from "react-select";
 import {
   calculateIntercoderSimilarity,
   getDateStringFromTimestamp,
-  isSimilar,
+  isInBoth,
   findSimilarBehavior,
 } from "src/utils";
 
@@ -103,39 +103,59 @@ function InterCoder() {
       return null;
     }
 
+    let behaviorANames = [];
+    let codingABehaviorsFiltered = codingA.codingBehaviors.filter(
+      (behavior) => {
+        if (!behaviorANames.includes(behavior.name)) {
+          behaviorANames.push(behavior.name);
+          return true;
+        }
+        return false;
+      }
+    );
+
+    let behaviorBNames = [];
+    let codingBBehaviorsFiltered = codingB.codingBehaviors.filter(
+      (behavior) => {
+        if (!behaviorBNames.includes(behavior.name)) {
+          behaviorBNames.push(behavior.name);
+          return true;
+        }
+        return false;
+      }
+    );
+
+    const behaviorsPosible = [
+      ...behaviorANames,
+      ...behaviorBNames.filter((b) => !behaviorANames.includes(b)),
+    ];
+
     return (
       <table>
         <thead>
           <tr>
-            <th>Coding A Behavior</th>
-            <th>Coding B Behavior</th>
+            <th>Behavior</th>
+            <th>Coding A</th>
+            <th>Coding A</th>
           </tr>
         </thead>
         <tbody>
-          {codingA.codingBehaviors.map((behaviorA, index) => (
+          {behaviorsPosible.map((behavior, index) => (
             <tr
               key={index}
               style={{
-                backgroundColor: isSimilar(
-                  behaviorA,
-                  codingB.codingBehaviors,
-                  deltaTime
+                backgroundColor: isInBoth(
+                  behavior,
+                  behaviorANames,
+                  behaviorBNames
                 )
                   ? "green"
                   : "white",
               }}
             >
-              <td>
-                {behaviorA.name} - {behaviorA.type} [{behaviorA.timeMarked} to{" "}
-                {behaviorA.timeEnded}]
-              </td>
-              <td>
-                {findSimilarBehavior(
-                  behaviorA,
-                  codingB.codingBehaviors,
-                  deltaTime
-                )}
-              </td>
+              <td>{behavior}</td>
+              <td>{behaviorANames.includes(behavior) ? "Yes" : "No"}</td>
+              <td>{behaviorBNames.includes(behavior) ? "Yes" : "No"}</td>
             </tr>
           ))}
         </tbody>
@@ -153,7 +173,6 @@ function InterCoder() {
         <thead>
           <tr>
             <th>Coding B Behavior</th>
-            <th>Coding A Behavior</th>
           </tr>
         </thead>
         <tbody>
@@ -161,25 +180,12 @@ function InterCoder() {
             <tr
               key={index}
               style={{
-                backgroundColor: isSimilar(
-                  behaviorB,
-                  codingA.codingBehaviors,
-                  deltaTime
-                )
-                  ? "green"
-                  : "white",
+                backgroundColor: "white",
               }}
             >
               <td>
                 {behaviorB.name} - {behaviorB.type} - [{behaviorB.timeMarked} to{" "}
                 {behaviorB.timeEnded}]
-              </td>
-              <td>
-                {findSimilarBehavior(
-                  behaviorB,
-                  codingA.codingBehaviors,
-                  deltaTime
-                )}
               </td>
             </tr>
           ))}
@@ -268,8 +274,6 @@ function InterCoder() {
               </div> */}
 
               {renderCodingBehaviorsComparison()}
-
-              {renderCodingBehaviorsComparisonReversed()}
             </>
           )}
         </div>

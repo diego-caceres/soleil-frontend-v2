@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { getDocs, collection } from "firebase/firestore";
-import { db } from "../../config/firebase";
 import { ResponsiveBar } from "@nivo/bar";
+import { db } from "../../config/firebase";
 
-const engagementOrder = [
-  "1- Doing the activity",
-  "2- Observing the activity",
-  "3- Repeating the activity",
-  "4- Positive emotional response",
-  "5- Past Experiences",
-  "6- Seeking and sharing information",
-  "7- Engaged and involved",
-];
-
-function EngagementChart() {
+function GenericComparisonChart() {
   const [codings, setCodings] = useState([]);
+  const [selectedCharacteristic, setSelectedCharacteristic] =
+    useState("gender"); // Default selected characteristic
 
   useEffect(() => {
     async function fetchCodings() {
@@ -30,96 +22,127 @@ function EngagementChart() {
     fetchCodings();
   }, []);
 
-  const calculateEngagementLevel = (codingBehaviors) => {
-    let maxEngagementLevel = -1;
-    for (const behavior of codingBehaviors) {
-      const behaviorIndex = engagementOrder.indexOf(behavior.name);
-      if (behaviorIndex > maxEngagementLevel) {
-        maxEngagementLevel = behaviorIndex;
-      }
-    }
-    return maxEngagementLevel + 1;
-  };
-
-  // Calculate aggregated engagement data per visitor grouping
-  const aggregateEngagementData = () => {
-    const groupedEngagementData = {};
-    const groupedEngagementData2 = {
-      initiation: {
-        group: "initiaton",
-        value: 60,
-      },
-      transition: {
-        group: "transition",
-        value: 15,
-      },
-      breaktrough: {
-        group: "breaktrough",
-        value: 25,
-      },
-    };
-
-    // let codingsFemale = codings.filter((c) => c.visitor.gender === "female");
+  // Get unique values of the selected characteristic
+  const getCharacteristicValues = () => {
+    const values = new Set();
 
     for (const coding of codings) {
-      const { ageRange, gender, typeOfGroup } = coding.visitor;
-      const engagementLevel = calculateEngagementLevel(coding.codingBehaviors);
+      const characteristic = coding.visitor[selectedCharacteristic];
+      values.add(characteristic);
+    }
 
-      const visitorGroup = `${ageRange}-${gender}-${typeOfGroup}`;
-      if (!groupedEngagementData[visitorGroup]) {
-        groupedEngagementData[visitorGroup] = {
-          group: visitorGroup,
-          value: engagementLevel,
-          // count: 1,
-        };
-      } else {
-        if (groupedEngagementData[visitorGroup].value < engagementLevel) {
-          groupedEngagementData[visitorGroup].value = engagementLevel;
+    return Array.from(values);
+  };
+
+  // Calculate the percentage of each gender group that reached each coding level
+  const calculatePercentageData = (characteristicValues) => {
+    const genderGroupData = {
+      Initiation: {},
+      Transition: {},
+      Breakthrough: {},
+    };
+
+    for (const coding of codings) {
+      const characteristic = coding.visitor[selectedCharacteristic];
+      const codingLevel = calculateCodingLevel(coding.codingBehaviors);
+
+      if (!characteristicValues.includes(characteristic)) {
+        continue; // Skip if the characteristic value is not selected
+      }
+
+      if (!genderGroupData[codingLevel][characteristic]) {
+        genderGroupData[codingLevel][characteristic] = 0;
+      }
+
+      genderGroupData[codingLevel][characteristic]++;
+    }
+
+    for (const value of characteristicValues) {
+      // Calculate percentages within the gender group
+      const total = Object.values(genderGroupData).reduce(
+        (acc, val) => acc + val[value],
+        0
+      );
+      for (const level of ["Initiation", "Transition", "Breakthrough"]) {
+        if (genderGroupData[level] !== undefined) {
+          genderGroupData[level][value] = (
+            (genderGroupData[level][value] / total) *
+            100
+          ).toFixed(1);
         }
-        // groupedEngagementData[visitorGroup].value += engagementLevel;
-        // groupedEngagementData[visitorGroup].count += 1;
       }
     }
 
-    const filteredEngagementData = Object.values(groupedEngagementData).filter(
-      (group) => group.value > 0
-    );
-
-    console.log("engagementChartData 1", filteredEngagementData);
-    console.log("engagementChartData 2 ", groupedEngagementData2);
-
-    const filteredEngagementData2 = Object.values(groupedEngagementData2);
-
-    return filteredEngagementData2;
-    // return groupedEngagementData2;
-
-    // Calculate average engagement level
-    // for (const group of Object.keys(groupedEngagementData)) {
-    //   if (groupedEngagementData[group].count > 0) {
-    //     groupedEngagementData[group].value /=
-    //       groupedEngagementData[group].count;
-    //   } else {
-    //     groupedEngagementData[group].value = 0;
-    //   }
-    // }
-
-    // return Object.values(groupedEngagementData);
+    return genderGroupData;
   };
 
-  // Prepare the data for the bar chart
-  // Example: { id: 'Male', group: 'Gender', value: 3 }
-  // This indicates that visitors with 'Male' gender reached an engagement level of 3 on average
-  const engagementChartData = aggregateEngagementData();
+  const calculateCodingLevel = (codingBehaviors) => {
+    if (codingBehaviors.some((behavior) => behavior.type === "Breakthrough")) {
+      return "Breakthrough";
+    } else if (
+      codingBehaviors.some((behavior) => behavior.type === "Transition")
+    ) {
+      return "Transition";
+    } else {
+      return "Initiation";
+    }
+  };
+
+  const handleCharacteristicChange = (event) => {
+    setSelectedCharacteristic(event.target.value);
+  };
+
+  const characteristicValues = getCharacteristicValues();
+  const percentageData = calculatePercentageData(characteristicValues);
+
+  const data = Object.keys(percentageData).map((key) => {
+    return {
+      category: key,
+      ...percentageData[key],
+    };
+  });
+
+  console.log("percentageData", percentageData);
+  console.log("data", data);
+
+  const format = (v) => `${v}%`;
 
   return (
     <div>
-      <h1>Engagement Chart</h1>
+      <h1>Generic Comparison Chart</h1>
+      <label>Select Comparing Characteristic:</label>
+      <select
+        value={selectedCharacteristic}
+        onChange={handleCharacteristicChange}
+      >
+        <option value="gender">Gender</option>
+        <option value="ageRange">Age Range</option>
+        <option value="typeOfGroup">Type of Group</option>
+      </select>
       <div style={{ width: "100%", height: "800px" }}>
         <ResponsiveBar
-          data={engagementChartData}
-          keys={["value"]}
-          indexBy="group"
-          margin={{ top: 20, right: 30, bottom: 50, left: 50 }}
+          data={data}
+          keys={characteristicValues}
+          indexBy="category"
+          margin={{ top: 20, right: 30, bottom: 150, left: 50 }}
+          groupMode="grouped"
+          // barComponent={CustomBar}
+          // labelFormat={format}
+          // tooltipFormat={format}
+          label={(d) => `${d.value} %`}
+          maxValue={100}
+          legends={[
+            {
+              dataFrom: "keys",
+              anchor: "bottom",
+              direction: "row",
+              translateY: 80,
+              itemWidth: 100,
+              itemHeight: 20,
+              itemsSpacing: 2,
+              symbolSize: 20,
+            },
+          ]}
           // Configure other Nivo bar chart settings here
         />
       </div>
@@ -127,4 +150,26 @@ function EngagementChart() {
   );
 }
 
-export default EngagementChart;
+function CustomBar(props) {
+  const { x, y, width, height, color, label } = props;
+  debugger;
+  const formattedLabel = `${label} %`;
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <rect width={width} height={height} fill={color} />
+      <text
+        x={width / 2}
+        y={height / 2}
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fill="white"
+        fontSize={12}
+      >
+        {formattedLabel}
+      </text>
+    </g>
+  );
+}
+
+export default GenericComparisonChart;
