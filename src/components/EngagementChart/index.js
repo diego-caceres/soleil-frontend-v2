@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { getDocs, collection } from "firebase/firestore";
 import { ResponsiveBar } from "@nivo/bar";
+import { useSelector } from "react-redux";
+
 import { db } from "../../config/firebase";
+import SelectGroupCharacteristic from "./SelectGroupCharacteristic";
+import { SelectExhibit } from "../SelectExhibit";
+import "./EngagementChart.scss";
 
 function GenericComparisonChart() {
   const [codings, setCodings] = useState([]);
-  const [selectedCharacteristic, setSelectedCharacteristic] =
-    useState("gender"); // Default selected characteristic
+  const [groupA, setGroupA] = useState(null);
+  const [groupB, setGroupB] = useState(null);
 
+  const exhibitsStore = useSelector((state) => state.exhibits);
+  const { selectedExhibit } = exhibitsStore;
+
+  // Get all the codings as the component renders the first time
   useEffect(() => {
     async function fetchCodings() {
       const codingsCollection = collection(db, "codings");
@@ -16,64 +25,96 @@ function GenericComparisonChart() {
         id: doc.id,
         ...doc.data(),
       }));
-      setCodings(codingsData);
+
+      const filteredCodings = codingsData.filter(
+        (coding) => coding.exhibitId === selectedExhibit.id
+      );
+      setCodings(filteredCodings);
     }
 
-    fetchCodings();
-  }, []);
+    if (selectedExhibit) {
+      fetchCodings();
+    }
+  }, [selectedExhibit]);
 
-  // Get unique values of the selected characteristic
-  const getCharacteristicValues = () => {
-    const values = new Set();
+  // Determine if a Coding is included in a defined group
+  const isCodingInGroup = (coding, group) => {
+    let isInGroup = true;
 
-    for (const coding of codings) {
-      const characteristic = coding.visitor[selectedCharacteristic];
-      values.add(characteristic);
+    if (group.gender !== "all" && coding.visitor.gender !== group.gender) {
+      isInGroup = false;
+    } else if (group.age !== "all" && coding.visitor.ageRange !== group.age) {
+      isInGroup = false;
+    } else if (
+      group.group !== "all" &&
+      coding.visitor.typeOfGroup !== group.group
+    ) {
+      isInGroup = false;
+    } else if (
+      group.facilitator !== "all" &&
+      coding.showFacilitator !== group.facilitator
+    ) {
+      isInGroup = false;
     }
 
-    return Array.from(values);
+    return isInGroup;
   };
 
-  // Calculate the percentage of each gender group that reached each coding level
-  const calculatePercentageData = (characteristicValues) => {
-    const genderGroupData = {
-      Initiation: {},
-      Transition: {},
-      Breakthrough: {},
+  // Calculate the percentage of each group that reached each coding level
+  const calculatePercentageData = () => {
+    const codingsGroupData = {
+      Initiation: {
+        ["Group A"]: 0,
+        ["Group B"]: 0,
+      },
+      Transition: {
+        ["Group A"]: 0,
+        ["Group B"]: 0,
+      },
+      Breakthrough: {
+        ["Group A"]: 0,
+        ["Group B"]: 0,
+      },
     };
 
     for (const coding of codings) {
-      const characteristic = coding.visitor[selectedCharacteristic];
       const codingLevel = calculateCodingLevel(coding.codingBehaviors);
 
-      if (!characteristicValues.includes(characteristic)) {
-        continue; // Skip if the characteristic value is not selected
+      // Group A
+      if (isCodingInGroup(coding, groupA)) {
+        if (!codingsGroupData[codingLevel]["Group A"]) {
+          codingsGroupData[codingLevel]["Group A"] = 0;
+        }
+
+        codingsGroupData[codingLevel]["Group A"]++;
       }
 
-      if (!genderGroupData[codingLevel][characteristic]) {
-        genderGroupData[codingLevel][characteristic] = 0;
-      }
+      if (isCodingInGroup(coding, groupB)) {
+        if (!codingsGroupData[codingLevel]["Group B"]) {
+          codingsGroupData[codingLevel]["Group B"] = 0;
+        }
 
-      genderGroupData[codingLevel][characteristic]++;
+        codingsGroupData[codingLevel]["Group B"]++;
+      }
     }
 
-    for (const value of characteristicValues) {
-      // Calculate percentages within the gender group
-      const total = Object.values(genderGroupData).reduce(
-        (acc, val) => acc + val[value],
+    // Calculate percentages within each group
+    for (const group of ["Group A", "Group B"]) {
+      const total = Object.values(codingsGroupData).reduce(
+        (acc, val) => acc + val[group],
         0
       );
       for (const level of ["Initiation", "Transition", "Breakthrough"]) {
-        if (genderGroupData[level] !== undefined) {
-          genderGroupData[level][value] = (
-            (genderGroupData[level][value] / total) *
+        if (codingsGroupData[level] !== undefined) {
+          codingsGroupData[level][group] = (
+            (codingsGroupData[level][group] / total) *
             100
           ).toFixed(1);
         }
       }
     }
 
-    return genderGroupData;
+    return codingsGroupData;
   };
 
   const calculateCodingLevel = (codingBehaviors) => {
@@ -88,64 +129,84 @@ function GenericComparisonChart() {
     }
   };
 
-  const handleCharacteristicChange = (event) => {
-    setSelectedCharacteristic(event.target.value);
-  };
+  let data = [];
 
-  const characteristicValues = getCharacteristicValues();
-  const percentageData = calculatePercentageData(characteristicValues);
+  if (selectedExhibit && groupA && groupB) {
+    const percentageData = calculatePercentageData();
+    console.log("percentageData", percentageData);
 
-  const data = Object.keys(percentageData).map((key) => {
-    return {
-      category: key,
-      ...percentageData[key],
-    };
-  });
-
-  console.log("percentageData", percentageData);
-  console.log("data", data);
+    data = Object.keys(percentageData).map((key) => {
+      return {
+        category: key,
+        ...percentageData[key],
+      };
+    });
+    console.log("data", data);
+  }
 
   const format = (v) => `${v}%`;
 
   return (
-    <div>
-      <h1>Generic Comparison Chart</h1>
-      <label>Select Comparing Characteristic:</label>
-      <select
-        value={selectedCharacteristic}
-        onChange={handleCharacteristicChange}
-      >
-        <option value="gender">Gender</option>
-        <option value="ageRange">Age Range</option>
-        <option value="typeOfGroup">Type of Group</option>
-      </select>
-      <div style={{ width: "100%", height: "800px" }}>
-        <ResponsiveBar
-          data={data}
-          keys={characteristicValues}
-          indexBy="category"
-          margin={{ top: 20, right: 30, bottom: 150, left: 50 }}
-          groupMode="grouped"
-          // barComponent={CustomBar}
-          // labelFormat={format}
-          // tooltipFormat={format}
-          label={(d) => `${d.value} %`}
-          maxValue={100}
-          legends={[
-            {
-              dataFrom: "keys",
-              anchor: "bottom",
-              direction: "row",
-              translateY: 80,
-              itemWidth: 100,
-              itemHeight: 20,
-              itemsSpacing: 2,
-              symbolSize: 20,
-            },
-          ]}
-          // Configure other Nivo bar chart settings here
-        />
+    <div className="engagement-chart-container">
+      <span className="page-title">Generic Comparison Chart</span>
+
+      <div className="initial-row">
+        <>
+          <div className="select-exhibit-row">
+            <span className="option-title">Select exhibit</span>
+            <SelectExhibit />
+          </div>
+
+          <span>Codings in the selected Exhibit: {codings.length}</span>
+        </>
+
+        <div className="select-groups-row">
+          <SelectGroupCharacteristic group="A" setGroup={setGroupA} />
+          <SelectGroupCharacteristic group="B" setGroup={setGroupB} />
+        </div>
       </div>
+
+      {selectedExhibit && groupA && groupB && (
+        <>
+          {codings.length > 0 ? (
+            <div
+              style={{
+                width: "100%",
+                height: "800px",
+                backgroundColor: "white",
+              }}
+            >
+              <ResponsiveBar
+                data={data}
+                keys={["Group A", "Group B"]}
+                indexBy="category"
+                margin={{ top: 20, right: 30, bottom: 150, left: 50 }}
+                groupMode="grouped"
+                // barComponent={CustomBar}
+                // labelFormat={format}
+                // tooltipFormat={format}
+                label={(d) => `${d.value} %`}
+                maxValue={100}
+                legends={[
+                  {
+                    dataFrom: "keys",
+                    anchor: "bottom",
+                    direction: "row",
+                    translateY: 80,
+                    itemWidth: 100,
+                    itemHeight: 20,
+                    itemsSpacing: 2,
+                    symbolSize: 20,
+                  },
+                ]}
+                // Configure other Nivo bar chart settings here
+              />
+            </div>
+          ) : (
+            <p>No codings in this exhibit</p>
+          )}
+        </>
+      )}
     </div>
   );
 }
