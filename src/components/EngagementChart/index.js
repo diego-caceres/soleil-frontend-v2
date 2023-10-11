@@ -8,10 +8,36 @@ import SelectGroupCharacteristic from "./SelectGroupCharacteristic";
 import { SelectExhibit } from "../SelectExhibit";
 import "./EngagementChart.scss";
 
+// Determine if a Coding is included in a defined group
+const isCodingInGroup = (coding, group) => {
+  let isInGroup = true;
+
+  if (group.gender !== "all" && coding.visitor.gender !== group.gender) {
+    isInGroup = false;
+  } else if (group.age !== "all" && coding.visitor.ageRange !== group.age) {
+    isInGroup = false;
+  } else if (
+    group.group !== "all" &&
+    coding.visitor.typeOfGroup !== group.group
+  ) {
+    isInGroup = false;
+  } else if (
+    group.facilitator !== "all" &&
+    `${coding.showFacilitator}` !== `${group.facilitator}`
+  ) {
+    isInGroup = false;
+  }
+
+  return isInGroup;
+};
+
 function GenericComparisonChart() {
   const [codings, setCodings] = useState([]);
   const [groupA, setGroupA] = useState(null);
   const [groupB, setGroupB] = useState(null);
+  const [errorA, setErrorA] = useState("");
+  const [errorB, setErrorB] = useState("");
+  const [data, setData] = useState(null);
 
   const exhibitsStore = useSelector((state) => state.exhibits);
   const { selectedExhibit } = exhibitsStore;
@@ -37,28 +63,24 @@ function GenericComparisonChart() {
     }
   }, [selectedExhibit]);
 
-  // Determine if a Coding is included in a defined group
-  const isCodingInGroup = (coding, group) => {
-    let isInGroup = true;
+  // Refresh chart when selecting values
+  useEffect(() => {
+    if (selectedExhibit && groupA && groupB) {
+      setErrorA("");
+      setErrorB("");
+      const percentageData = calculatePercentageData();
+      console.log("percentageData", percentageData);
 
-    if (group.gender !== "all" && coding.visitor.gender !== group.gender) {
-      isInGroup = false;
-    } else if (group.age !== "all" && coding.visitor.ageRange !== group.age) {
-      isInGroup = false;
-    } else if (
-      group.group !== "all" &&
-      coding.visitor.typeOfGroup !== group.group
-    ) {
-      isInGroup = false;
-    } else if (
-      group.facilitator !== "all" &&
-      coding.showFacilitator !== group.facilitator
-    ) {
-      isInGroup = false;
+      const dataForChart = Object.keys(percentageData).map((key) => {
+        return {
+          category: key,
+          ...percentageData[key],
+        };
+      });
+      console.log("dataForChart", dataForChart);
+      setData(dataForChart);
     }
-
-    return isInGroup;
-  };
+  }, [selectedExhibit, groupA, groupB]);
 
   // Calculate the percentage of each group that reached each coding level
   const calculatePercentageData = () => {
@@ -79,21 +101,12 @@ function GenericComparisonChart() {
 
     for (const coding of codings) {
       const codingLevel = calculateCodingLevel(coding.codingBehaviors);
-
       // Group A
       if (isCodingInGroup(coding, groupA)) {
-        if (!codingsGroupData[codingLevel]["Group A"]) {
-          codingsGroupData[codingLevel]["Group A"] = 0;
-        }
-
         codingsGroupData[codingLevel]["Group A"]++;
       }
 
       if (isCodingInGroup(coding, groupB)) {
-        if (!codingsGroupData[codingLevel]["Group B"]) {
-          codingsGroupData[codingLevel]["Group B"] = 0;
-        }
-
         codingsGroupData[codingLevel]["Group B"]++;
       }
     }
@@ -105,11 +118,15 @@ function GenericComparisonChart() {
         0
       );
       for (const level of ["Initiation", "Transition", "Breakthrough"]) {
-        if (codingsGroupData[level] !== undefined) {
+        if (codingsGroupData[level] !== undefined && total !== 0) {
           codingsGroupData[level][group] = (
             (codingsGroupData[level][group] / total) *
             100
           ).toFixed(1);
+        } else {
+          codingsGroupData[level][group] = 0;
+          if (group === "Group A") setErrorA(`No matches for ${group}. `);
+          if (group === "Group B") setErrorB(`No matches for ${group}. `);
         }
       }
     }
@@ -128,21 +145,6 @@ function GenericComparisonChart() {
       return "Initiation";
     }
   };
-
-  let data = [];
-
-  if (selectedExhibit && groupA && groupB) {
-    const percentageData = calculatePercentageData();
-    console.log("percentageData", percentageData);
-
-    data = Object.keys(percentageData).map((key) => {
-      return {
-        category: key,
-        ...percentageData[key],
-      };
-    });
-    console.log("data", data);
-  }
 
   const format = (v) => `${v}%`;
 
@@ -164,9 +166,14 @@ function GenericComparisonChart() {
           <SelectGroupCharacteristic group="A" setGroup={setGroupA} />
           <SelectGroupCharacteristic group="B" setGroup={setGroupB} />
         </div>
+
+        <div>
+          {errorA}
+          {errorB}
+        </div>
       </div>
 
-      {selectedExhibit && groupA && groupB && (
+      {data && (
         <>
           {codings.length > 0 ? (
             <div
