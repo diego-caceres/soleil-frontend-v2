@@ -5,6 +5,8 @@ import { db } from "../../config/firebase";
 
 import Select from "react-select";
 
+import "./intercoder.css";
+
 // import { loadVideoNames, setSelectedVideo } from "src/redux/interCoder";
 import {
   calculateIntercoderSimilarity,
@@ -195,8 +197,7 @@ function InterCoder() {
   };
 
   return (
-    <div>
-      <h1>InterCoder</h1>
+    <div className="intercoder-wrapper">
       <div>
         <label>Select Video:</label>
         <select value={selectedVideo} onChange={handleVideoSelect}>

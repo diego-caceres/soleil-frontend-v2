@@ -10,7 +10,7 @@ import { setEvaluator } from "src/redux/exhibits";
 export const Router = () => {
   const dispatch = useDispatch();
 
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -32,9 +32,11 @@ export const Router = () => {
     });
   }, []);
 
-  if (loggedIn) {
+  if (loggedIn === true) {
     return <AppRoutes />;
-  } else {
+  } else if (loggedIn === false) {
     return <Auth />;
+  } else {
+    return <div className="loading-screen">Loading...</div>;
   }
 };

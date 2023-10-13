@@ -21,22 +21,36 @@ button {
   cursor: pointer;
 }
 
-.logoutButton {
-  position: absolute;
-  top: 5px;
-  right: 10px;
-  cursor: pointer;
-  border: none;
-  border-radius: 4px;
-  padding: 5px;
+
+
+.app-wrapper {
+  background-color: #242424;
+  min-height: 100% !important;
+  height: 100%;
 }
-  
-.header-row {
-  background-color: #daa520b3;
-  color: white;
-  padding: 5px 10px;
-  font-weight: bold;
+
+.loading-screen {
+  background-color: #242424;
+  min-height: 100% !important;
+  height: 100%;
   display: flex;
-  flex-direction: row;
+  justify-content: center;
   align-items: center;
+  color: white;
+  font-size: 15px;
+}
+
+.soleil-logo {
+  background: url('./images/sun.png'), 50% / cover no-repeat;
+  width: 208px;
+  height: 207px;
+  flex-shrink: 0;
+  margin: 50px;
+}
+
+.soleil-logo-small {
+  background: url('./images/small-sun.png'), 50% / cover no-repeat;
+  width: 48px;
+  height: 50px;
+  flex-shrink: 0;
 }

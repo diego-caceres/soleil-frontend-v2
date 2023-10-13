@@ -24,7 +24,6 @@ function GenericComparisonChart() {
 
   // Get unique values of the selected characteristic
   const getCharacteristicValues = () => {
-    debugger;
     const values = new Set();
 
     for (const coding of codings) {
@@ -44,7 +43,6 @@ function GenericComparisonChart() {
     };
 
     for (const coding of codings) {
-      debugger;
       const characteristic = coding.visitor[selectedCharacteristic];
       const codingLevel = calculateCodingLevel(coding.codingBehaviors);
 
@@ -154,7 +152,6 @@ function GenericComparisonChart() {
 
 function CustomBar(props) {
   const { x, y, width, height, color, label } = props;
-  debugger;
   const formattedLabel = `${label} %`;
 
   return (

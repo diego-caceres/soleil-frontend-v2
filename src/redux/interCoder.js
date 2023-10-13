@@ -45,7 +45,6 @@ export const loadVideoNames = () => {
     }));
 
     let videoNames = [];
-    debugger;
     filteredCodingsData.forEach((coding) => {
       if (!videoNames.includes(coding.videoName)) {
         videoNames.push(coding.videoName);

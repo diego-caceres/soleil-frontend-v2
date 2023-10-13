@@ -1,0 +1,62 @@
+.appBar-row {
+  background-color: #161717;
+  color: white;
+  height: 100px;
+  padding: 5px 20px;
+  font-weight: bold;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.appBar-goback {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.appBar-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+
+  width: 300px;
+}
+
+.appBar-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.appBar-exhibit {
+  color: #FFF;
+
+  font-family: Poppins;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.appBar-evaluator {
+  color: #5E5E5E;
+
+  font-family: Poppins;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.goback-btn {
+  border: none;
+  background: none;
+  color: white;
+}
+
+.logoutButton {
+  padding: 2px 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 2px solid var(--Black, #1B1D1F);
+  background: #D9D9D9;
+}

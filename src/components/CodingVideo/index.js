@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 
 import { SelectExhibit } from "../SelectExhibit";
-import { Header } from "../Header";
 import { saveCoding } from "src/redux/codings";
 import { toHHMMSS } from "src/utils";
 import {
@@ -260,7 +259,6 @@ const CodingVideo = () => {
   if (!selectedExhibit) {
     return (
       <div className="video-coding-container">
-        <Header />
         <div className="select-exhibit-section">
           <SelectExhibit />
         </div>
@@ -270,23 +268,250 @@ const CodingVideo = () => {
 
   return (
     <div className="video-coding-container">
-      <Header />
-      <div className="top-half">
-        <div className="video-section">
-          {videoURL ? (
-            <ReactPlayer url={videoURL} ref={playerRef} controls />
-          ) : (
-            <div>
-              <label>Seleccione un video de su computadora</label>
-              <input
-                id="upload"
-                type="file"
-                accept="video/*"
-                onChange={handleFileClicked}
+      <div className="coding-section">
+        <div className="top-half">
+          <div className="video-section">
+            {videoURL ? (
+              <ReactPlayer url={videoURL} ref={playerRef} controls />
+            ) : (
+              <div>
+                <label>Seleccione un video de su computadora</label>
+                <input
+                  id="upload"
+                  type="file"
+                  accept="video/*"
+                  onChange={handleFileClicked}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="characteristics-section">
+            <span className="title">Visitor</span>
+            <div className="select-container">
+              <Select
+                placeholder="Gender"
+                options={genderOptions}
+                value={gender}
+                onChange={setGender}
               />
             </div>
-          )}
+            <div className="select-container">
+              <Select
+                placeholder="Age"
+                options={ageOptions}
+                value={ageRange}
+                onChange={setAgeRange}
+              />
+            </div>
+
+            <div className="select-container">
+              <Select
+                placeholder="Group"
+                value={amount}
+                options={groupOptions}
+                onChange={setAmount}
+              />
+            </div>
+
+            <span className="title">Facilitator</span>
+            <div className="select-container">
+              <Select
+                placeholder="Gender"
+                options={genderOptions}
+                value={facilitatorGender}
+                onChange={setFacilitatorGender}
+              />
+            </div>
+            <div className="select-container">
+              <Select
+                placeholder="Age"
+                options={ageOptions}
+                value={facilitatorAgeRange}
+                onChange={setFacilitatorAgeRange}
+              />
+            </div>
+
+            <span className="title">General</span>
+            <div className="select-container">
+              <Select
+                placeholder="Language"
+                value={language}
+                options={languageOptions}
+                onChange={setLanguage}
+              />
+            </div>
+            <div className="select-container">
+              <Select
+                placeholder="Day Status"
+                value={dayStatus}
+                options={dayStatusOptions}
+                onChange={setDayStatus}
+              />
+            </div>
+          </div>
         </div>
+
+        <div className="bottom-half">
+          <div className="visitor-section">
+            <div className="top-row">
+              <div className="visitor-behaviors-container first-four-interactions">
+                {visitorBehaviorsFirst4.map((behavior) => {
+                  const { id, name } = behavior;
+                  const selectedClass = visitorBehaviorsOpen.find(
+                    (vb) => vb.id === id
+                  )
+                    ? "behavior-item-selected"
+                    : "";
+                  return (
+                    <div
+                      key={name}
+                      className={`visitor-behaviors-item ${selectedClass}`}
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                        style={{ background: "#DA4453" }}
+                      >
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="visitor-behaviors-container">
+              {visitorBehaviorsRest.map((behavior, index) => {
+                const { id, name } = behavior;
+                const selectedClass = visitorBehaviorsOpen.find(
+                  (vb) => vb.id === id
+                )
+                  ? "behavior-item-selected"
+                  : "";
+                return (
+                  <div
+                    key={name}
+                    className={`visitor-behaviors-item ${selectedClass}`}
+                  >
+                    <button
+                      onClick={() => addBehaviorToCoding(behavior)}
+                      style={
+                        index < 3
+                          ? { background: "#E9573F" }
+                          : { background: "#F6BB42" }
+                      }
+                    >
+                      {name}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="facilitator-section">
+            <div className="bottom-row">
+              <div className="facilitator-behaviors-container">
+                {confortBehaviors.map((behavior) => {
+                  const { id, name } = behavior;
+                  const selectedClass = facilitatorBehaviorsOpen.find(
+                    (vb) => vb.id === id
+                  )
+                    ? "behavior-item-selected"
+                    : "";
+                  return (
+                    <div
+                      key={name}
+                      className={`facilitator-behaviors-item ${selectedClass}`}
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                        className="confort-behavior-btn"
+                      >
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="facilitator-behaviors-container">
+                {exhibitUseBehaviors.map((behavior) => {
+                  const { id, name } = behavior;
+                  const selectedClass = facilitatorBehaviorsOpen.find(
+                    (vb) => vb.id === id
+                  )
+                    ? "behavior-item-selected"
+                    : "";
+
+                  return (
+                    <div
+                      key={name}
+                      className={`facilitator-behaviors-item ${selectedClass}`}
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                        className="exhibitUse-behavior-btn"
+                      >
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="facilitator-behaviors-container">
+                {reflectionBehaviors.map((behavior) => {
+                  const { id, name } = behavior;
+                  const selectedClass = facilitatorBehaviorsOpen.find(
+                    (vb) => vb.id === id
+                  )
+                    ? "behavior-item-selected"
+                    : "";
+
+                  return (
+                    <div
+                      key={name}
+                      className={`facilitator-behaviors-item ${selectedClass}`}
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                        className="reflection-behavior-btn"
+                      >
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="facilitator-behaviors-container">
+                {informationBehaviors.map((behavior) => {
+                  const { id, name } = behavior;
+                  const selectedClass = facilitatorBehaviorsOpen.find(
+                    (vb) => vb.id === id
+                  )
+                    ? "behavior-item-selected"
+                    : "";
+
+                  return (
+                    <div
+                      key={name}
+                      className={`facilitator-behaviors-item ${selectedClass}`}
+                    >
+                      <button
+                        onClick={() => addBehaviorToCoding(behavior)}
+                        className="information-behavior-btn"
+                      >
+                        {name}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="finish-section">
         <div className="list-interactions-section">
           <div className="title-row">
             <h2>List of interactions</h2>
@@ -326,262 +551,39 @@ const CodingVideo = () => {
               })
             )}
           </div>
-          <div className="nextSteps">
-            <button
-              className="end-buttons"
-              onClick={onNewVisitorClicked}
-              disabled={savingCoding}
-            >
-              new visitor
-            </button>
-            <button
-              className="end-buttons"
-              onClick={onEndClicked}
-              disabled={savingCoding}
-            >
-              end
-            </button>
-          </div>
         </div>
-      </div>
-
-      <div className="bottom-half">
-        <div className="visitor-section">
-          <div className="description-top-row">
-            <div className="description-container">
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Visitor description"
-              />
-            </div>
-            <div>
-              <div className="top-row">
-                <div className="select-container">
-                  <Select
-                    placeholder="Gender"
-                    options={genderOptions}
-                    value={gender}
-                    onChange={setGender}
-                  />
-                </div>
-                <div className="select-container">
-                  <Select
-                    placeholder="Age"
-                    options={ageOptions}
-                    value={ageRange}
-                    onChange={setAgeRange}
-                  />
-                </div>
-
-                <div className="select-container">
-                  <Select
-                    placeholder="Group"
-                    value={amount}
-                    options={groupOptions}
-                    onChange={setAmount}
-                  />
-                </div>
-              </div>
-              <div className="visitor-behaviors-container first-four-interactions">
-                {visitorBehaviorsFirst4.map((behavior) => {
-                  const { id, name } = behavior;
-                  const selectedClass = visitorBehaviorsOpen.find(
-                    (vb) => vb.id === id
-                  )
-                    ? "behavior-item-selected"
-                    : "";
-                  return (
-                    <div
-                      key={name}
-                      className={`visitor-behaviors-item ${selectedClass}`}
-                    >
-                      <button
-                        onClick={() => addBehaviorToCoding(behavior)}
-                        style={{ background: "#DA4453" }}
-                      >
-                        {name}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          <div className="observation-bottom-row">
-            <div className="observation-container">
-              <textarea
-                value={observations}
-                onChange={(e) => setObservations(e.target.value)}
-                type="text"
-                placeholder="Observations"
-              />
-            </div>
-            <div className="">
-              <div className="visitor-behaviors-container">
-                {visitorBehaviorsRest.map((behavior, index) => {
-                  const { id, name } = behavior;
-                  const selectedClass = visitorBehaviorsOpen.find(
-                    (vb) => vb.id === id
-                  )
-                    ? "behavior-item-selected"
-                    : "";
-                  return (
-                    <div
-                      key={name}
-                      className={`visitor-behaviors-item ${selectedClass}`}
-                    >
-                      <button
-                        onClick={() => addBehaviorToCoding(behavior)}
-                        style={
-                          index < 3
-                            ? { background: "#E9573F" }
-                            : { background: "#F6BB42" }
-                        }
-                      >
-                        {name}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
+        <div className="description-container">
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Visitor description"
+          />
         </div>
 
-        <div className="facilitator-section">
-          <div className="top-row">
-            <div className="select-container">
-              <Select
-                placeholder="Gender"
-                options={genderOptions}
-                value={facilitatorGender}
-                onChange={setFacilitatorGender}
-              />
-            </div>
-            <div className="select-container">
-              <Select
-                placeholder="Age"
-                options={ageOptions}
-                value={facilitatorAgeRange}
-                onChange={setFacilitatorAgeRange}
-              />
-            </div>
-            <div className="select-container">
-              <Select
-                placeholder="Language"
-                value={language}
-                options={languageOptions}
-                onChange={setLanguage}
-              />
-            </div>
-            <div className="select-container">
-              <Select
-                placeholder="Day Status"
-                value={dayStatus}
-                options={dayStatusOptions}
-                onChange={setDayStatus}
-              />
-            </div>
-          </div>
-          <div className="bottom-row">
-            <div className="facilitator-behaviors-container">
-              {confortBehaviors.map((behavior) => {
-                const { id, name } = behavior;
-                const selectedClass = facilitatorBehaviorsOpen.find(
-                  (vb) => vb.id === id
-                )
-                  ? "behavior-item-selected"
-                  : "";
-                return (
-                  <div
-                    key={name}
-                    className={`facilitator-behaviors-item ${selectedClass}`}
-                  >
-                    <button
-                      onClick={() => addBehaviorToCoding(behavior)}
-                      className="confort-behavior-btn"
-                    >
-                      {name}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="facilitator-behaviors-container">
-              {exhibitUseBehaviors.map((behavior) => {
-                const { id, name } = behavior;
-                const selectedClass = facilitatorBehaviorsOpen.find(
-                  (vb) => vb.id === id
-                )
-                  ? "behavior-item-selected"
-                  : "";
+        <div className="observation-container">
+          <textarea
+            value={observations}
+            onChange={(e) => setObservations(e.target.value)}
+            type="text"
+            placeholder="Observations"
+          />
+        </div>
 
-                return (
-                  <div
-                    key={name}
-                    className={`facilitator-behaviors-item ${selectedClass}`}
-                  >
-                    <button
-                      onClick={() => addBehaviorToCoding(behavior)}
-                      className="exhibitUse-behavior-btn"
-                    >
-                      {name}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="facilitator-behaviors-container">
-              {reflectionBehaviors.map((behavior) => {
-                const { id, name } = behavior;
-                const selectedClass = facilitatorBehaviorsOpen.find(
-                  (vb) => vb.id === id
-                )
-                  ? "behavior-item-selected"
-                  : "";
-
-                return (
-                  <div
-                    key={name}
-                    className={`facilitator-behaviors-item ${selectedClass}`}
-                  >
-                    <button
-                      onClick={() => addBehaviorToCoding(behavior)}
-                      className="reflection-behavior-btn"
-                    >
-                      {name}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="facilitator-behaviors-container">
-              {informationBehaviors.map((behavior) => {
-                const { id, name } = behavior;
-                const selectedClass = facilitatorBehaviorsOpen.find(
-                  (vb) => vb.id === id
-                )
-                  ? "behavior-item-selected"
-                  : "";
-
-                return (
-                  <div
-                    key={name}
-                    className={`facilitator-behaviors-item ${selectedClass}`}
-                  >
-                    <button
-                      onClick={() => addBehaviorToCoding(behavior)}
-                      className="information-behavior-btn"
-                    >
-                      {name}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+        <div className="nextSteps">
+          <button
+            className="end-buttons-new"
+            onClick={onNewVisitorClicked}
+            disabled={savingCoding}
+          >
+            New visitor
+          </button>
+          <button
+            className="end-buttons-end"
+            onClick={onEndClicked}
+            disabled={savingCoding}
+          >
+            END
+          </button>
         </div>
       </div>
 

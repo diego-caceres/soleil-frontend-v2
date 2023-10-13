@@ -231,7 +231,6 @@ const CodingLive = () => {
     return (
       <div>
         <p>No Exhibit selected.</p>
-        <a href="/">Go Back</a>
       </div>
     );
   }
@@ -244,10 +243,6 @@ const CodingLive = () => {
   );
   return (
     <div className="live-coding-container">
-      <div className="header-row">
-        Live Coding!! | Exhibit: {selectedExhibit.name} | Evaluator:{" "}
-        {currentEvaluator?.name} | <a href="/">Go Back</a>
-      </div>
       <div className="top-half">
         <div className="visitor-section">
           <div className="first-row">

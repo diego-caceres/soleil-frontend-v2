@@ -43,8 +43,6 @@ export const calculateSimilarity = (
 };
 
 export const calculateIntercoderSimilarity = (codingA, codingB) => {
-  debugger;
-
   let behaviorANames = [];
   let codingABehaviorsFiltered = codingA.codingBehaviors.filter((behavior) => {
     if (!behaviorANames.includes(behavior.name)) {
@@ -86,7 +84,6 @@ export const calculateIntercoderSimilarity = (codingA, codingB) => {
 //   deltaTime,
 //   ignoreTimeEnded = false
 // ) => {
-//   debugger;
 //   const totalBehaviorsA = codingA.codingBehaviors.length;
 //   const totalBehaviorsB = codingB.codingBehaviors.length;
 //   let totalSimilarity = 0;

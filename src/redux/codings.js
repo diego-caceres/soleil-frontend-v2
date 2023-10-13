@@ -42,7 +42,6 @@ export const saveCoding = (codingToSave, callback) => {
         videoDuration: codingToSave.videoDuration,
         codedDate: new Date(),
       };
-      debugger;
       const coding = await addDoc(codingsCollectionRef, codingData);
       if (coding.id) {
         if (callback) {

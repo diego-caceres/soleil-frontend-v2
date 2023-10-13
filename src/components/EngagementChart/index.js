@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { db } from "../../config/firebase";
 import SelectGroupCharacteristic from "./SelectGroupCharacteristic";
 import { SelectExhibit } from "../SelectExhibit";
+
 import "./EngagementChart.scss";
 
 // Determine if a Coding is included in a defined group
@@ -220,7 +221,6 @@ function GenericComparisonChart() {
 
 function CustomBar(props) {
   const { x, y, width, height, color, label } = props;
-  debugger;
   const formattedLabel = `${label} %`;
 
   return (

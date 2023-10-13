@@ -9,6 +9,8 @@ import {
 import { auth } from "../../config/firebase";
 import { setEvaluator } from "src/redux/exhibits";
 
+import SoleilLogo from "src/components/SoleilLogo";
+
 import { createExibits } from "src/seeds/exhibits";
 import { createBehaviors } from "src/seeds/behaviors";
 
@@ -20,8 +22,6 @@ export const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
-  console.log("Current User:", auth?.currentUser?.email);
 
   const handleSignIn = async () => {
     try {
@@ -51,7 +51,7 @@ export const Auth = () => {
 
   return (
     <div className="loginWrapper">
-      <h1>Soleil</h1>
+      <SoleilLogo />
       <input
         type="text"
         placeholder="Email.."
@@ -65,7 +65,9 @@ export const Auth = () => {
 
       {/* <button onClick={handleSignIn}>Sign In</button> */}
 
-      <button onClick={handleLoginIn}>Login</button>
+      <button className="login-btn" onClick={handleLoginIn}>
+        Login
+      </button>
 
       <div className="errorWrapper">{error && <p>{error}</p>}</div>
 
