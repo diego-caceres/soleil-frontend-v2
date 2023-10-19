@@ -141,7 +141,7 @@ function InterCoder() {
             <th>Coding A</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="table-body">
           {behaviorsPosible.map((behavior, index) => (
             <tr
               key={index}
@@ -151,7 +151,7 @@ function InterCoder() {
                   behaviorANames,
                   behaviorBNames
                 )
-                  ? "green"
+                  ? "#47b647"
                   : "white",
               }}
             >
@@ -177,7 +177,7 @@ function InterCoder() {
             <th>Coding B Behavior</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="table-body">
           {codingB.codingBehaviors.map((behaviorB, index) => (
             <tr
               key={index}
@@ -198,7 +198,7 @@ function InterCoder() {
 
   return (
     <div className="intercoder-wrapper">
-      <div>
+      <div className="intercoder-select">
         <label>Select Video:</label>
         <select value={selectedVideo} onChange={handleVideoSelect}>
           <option value="">Select Video</option>
@@ -212,7 +212,7 @@ function InterCoder() {
 
       {selectedVideo && (
         <div>
-          <div>
+          <div className="intercoder-select">
             <label>Select Coding A:</label>
             <select
               value={codingA ? codingA.id : ""}
@@ -227,7 +227,7 @@ function InterCoder() {
               ))}
             </select>
           </div>
-          <div>
+          <div className="intercoder-select">
             <label>Select Coding B:</label>
             <select
               value={codingB ? codingB.id : ""}

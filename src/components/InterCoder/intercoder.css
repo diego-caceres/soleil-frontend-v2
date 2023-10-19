@@ -3,3 +3,18 @@
   color: white;
   padding: 20px;
 }
+
+.intercoder-select { 
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+
+.table-body {
+  color: black;
+}
+
+.table-body td {
+  padding: 2px;
+}
