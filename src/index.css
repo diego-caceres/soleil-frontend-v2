@@ -27,6 +27,7 @@ button {
   background-color: #242424;
   min-height: 100% !important;
   height: 100%;
+  overflow-y: scroll;
 }
 
 .loading-screen {

@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
-// import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getDocs, collection } from "firebase/firestore";
 import { db } from "../../config/firebase";
 
 import Select from "react-select";
+
+import { loadExhibits } from "src/redux/exhibits";
+import { loadBehaviors } from "src/redux/behaviors";
 
 import "./intercoder.css";
 
@@ -16,15 +19,28 @@ import {
 } from "src/utils";
 
 function InterCoder() {
+  const dispatch = useDispatch();
   const [codings, setCodings] = useState([]);
-  const [videoNames, setVideoNames] = useState([]);
-  const [deltaTime, setDeltaTime] = useState(1.5);
-  const [selectedVideo, setSelectedVideo] = useState("");
-  const [codingA, setCodingA] = useState("");
-  const [codingB, setCodingB] = useState("");
-  const [interCoderReliability, setInterCoderReliability] = useState(null);
-  const [interCoderReliabilityITE, setInterCoderReliabilityITE] =
-    useState(null);
+  const [codingsA, setCodingsA] = useState([]);
+  const [codingsB, setCodingsB] = useState([]);
+
+  const [coderNames, setCoderNames] = useState([]);
+
+  const [evaluatorNameA, setEvaluatorNameA] = useState("");
+  const [evaluatorNameB, setEvaluatorNameB] = useState("");
+
+  const [exhibitOptions, setExhibitOptions] = useState([]);
+  const [selectedExhibits, setSelectedExhibits] = useState([]);
+
+  const [behaviorsWithKappa, setBehaviosWithKappa] = useState([]);
+
+  const exhibitsStore = useSelector((state) => state.exhibits);
+  const { list: exhibitsList } = exhibitsStore;
+  const behaviorsStore = useSelector((state) => state.behaviors);
+  const { facilitatorBehaviors } = behaviorsStore;
+
+  // const [codingA, setCodingA] = useState("");
+  // const [codingB, setCodingB] = useState("");
 
   useEffect(() => {
     async function fetchCodings() {
@@ -36,316 +52,417 @@ function InterCoder() {
       }));
       setCodings(codingsData);
 
-      const uniqueVideoNames = Array.from(
-        new Set(codingsData.map((coding) => coding.videoName))
+      const uniqueCoderNames = Array.from(
+        new Set(codingsData.map((coding) => coding.evaluatorName))
       );
-      setVideoNames(uniqueVideoNames);
+      setCoderNames(uniqueCoderNames);
     }
 
     fetchCodings();
+    dispatch(loadExhibits());
+    dispatch(loadBehaviors());
   }, []);
 
-  const handleVideoSelect = (event) => {
-    const selectedVideoName = event.target.value;
-    setSelectedVideo(selectedVideoName);
-    setCodingA("");
-    setCodingB("");
+  useEffect(() => {
+    if (exhibitsList && exhibitsList.length > 0) {
+      const exhibits = exhibitsList.map((exhibit) => ({
+        value: exhibit.id,
+        label: exhibit.name,
+      }));
+      setExhibitOptions(exhibits);
+    }
+  }, [exhibitsList]);
+
+  useEffect(() => {
+    // Get all codings that have been coded by both coders
+    if (evaluatorNameA) {
+      let codingsAfiltered = codings.filter(
+        (coding) => coding.evaluatorName === evaluatorNameA
+      );
+
+      setCodingsA(codingsAfiltered);
+    }
+    if (evaluatorNameB) {
+      let codingsBfiltered = codings.filter(
+        (coding) => coding.evaluatorName === evaluatorNameB
+      );
+      setCodingsB(codingsBfiltered);
+    }
+  }, [evaluatorNameA, evaluatorNameB]);
+
+  useEffect(() => {
+    if (codingsA.length > 0 && codingsB.length > 0 && exhibitsList.length > 0) {
+      // Filter exhibits that are in codingsA and codingsB
+      const exhibitsA = codingsA.map((coding) => coding.exhibitId);
+      const exhibitsB = codingsB.map((coding) => coding.exhibitId);
+      const filteredExibitsList = exhibitsList.filter((exhibit) => {
+        return exhibitsA.includes(exhibit.id) && exhibitsB.includes(exhibit.id);
+      });
+      const exhibits = filteredExibitsList.map((exhibit) => ({
+        value: exhibit.id,
+        label: exhibit.name,
+      }));
+      setExhibitOptions(exhibits);
+    }
+  }, [codingsA, codingsB]);
+
+  const handleCoderASelect = (event) => {
+    const selectedCoderName = event.target.value;
+    setEvaluatorNameA(selectedCoderName);
   };
 
-  const filterCodingsByVideo = (videoName) => {
-    return codings.filter((coding) => coding.videoName === videoName);
+  const handleCoderBSelect = (event) => {
+    const selectedCoderName = event.target.value;
+    setEvaluatorNameB(selectedCoderName);
   };
-
-  const handleCodingASelect = (event) => {
-    const selectedCodingId = event.target.value;
-    const selectedCoding = filterCodingsByVideo(selectedVideo).find(
-      (coding) => coding.id === selectedCodingId
-    );
-    setCodingA(selectedCoding);
-    setInterCoderReliability(null);
-    setInterCoderReliabilityITE(null);
-  };
-
-  const handleCodingBSelect = (event) => {
-    const selectedCodingId = event.target.value;
-    const selectedCoding = filterCodingsByVideo(selectedVideo).find(
-      (coding) => coding.id === selectedCodingId
-    );
-    setCodingB(selectedCoding);
-    setInterCoderReliability(null);
-    setInterCoderReliabilityITE(null);
-  };
-
-  const isCalculateButtonEnabled = codingA && codingB;
 
   const handleCalculateClick = () => {
-    // Perform your intercoder similarity calculation here using codingA and codingB
-    // You can use the calculateIntercoderSimilarity function from the earlier conversation
-    // or your custom implementation
-    // For example:
-    const intercoderSimilarity = calculateIntercoderSimilarity(
-      codingA,
-      codingB,
-      deltaTime
-    );
-    setInterCoderReliability(intercoderSimilarity);
+    let auxCodingsA = [...codingsA];
+    let auxCodingsB = [...codingsB];
 
-    // ITE Ignore Time Ended
-    const intercoderSimilarityITE = calculateIntercoderSimilarity(
-      codingA,
-      codingB,
-      deltaTime,
-      true
-    );
-    setInterCoderReliabilityITE(intercoderSimilarityITE);
-  };
+    debugger;
+    // If selected Exhibits, filter exhibits:
+    if (selectedExhibits.length > 0) {
+      auxCodingsA = auxCodingsA.filter((coding) =>
+        selectedExhibits.some((e) => e.value === coding.exhibitId)
+      );
 
-  const renderCodingBehaviorsComparison = () => {
-    if (!codingA || !codingB) {
-      return null;
+      auxCodingsB = auxCodingsB.filter((coding) =>
+        selectedExhibits.some((e) => e.value === coding.exhibitId)
+      );
     }
 
-    let behaviorANames = [];
-    let codingABehaviorsFiltered = codingA.codingBehaviors.filter(
-      (behavior) => {
-        if (!behaviorANames.includes(behavior.name)) {
-          behaviorANames.push(behavior.name);
-          return true;
-        }
-        return false;
-      }
-    );
-
-    let behaviorBNames = [];
-    let codingBBehaviorsFiltered = codingB.codingBehaviors.filter(
-      (behavior) => {
-        if (!behaviorBNames.includes(behavior.name)) {
-          behaviorBNames.push(behavior.name);
-          return true;
-        }
-        return false;
-      }
-    );
-
-    const behaviorsPosible = [
-      ...behaviorANames,
-      ...behaviorBNames.filter((b) => !behaviorANames.includes(b)),
+    // Get the intersection of the two codings by video name
+    let codingsByBoth = [
+      ...auxCodingsA.filter((codingA) =>
+        auxCodingsB.some((codingB) => codingA.videoName === codingB.videoName)
+      ),
+      ...auxCodingsB.filter((codingB) =>
+        auxCodingsA.some((codingA) => codingB.videoName === codingA.videoName)
+      ),
     ];
 
-    return (
-      <table>
-        <thead>
-          <tr>
-            <th>Behavior</th>
-            <th>Coding A</th>
-            <th>Coding A</th>
-          </tr>
-        </thead>
-        <tbody className="table-body">
-          {behaviorsPosible.map((behavior, index) => (
-            <tr
-              key={index}
-              style={{
-                backgroundColor: isInBoth(
-                  behavior,
-                  behaviorANames,
-                  behaviorBNames
-                )
-                  ? "#47b647"
-                  : "white",
-              }}
-            >
-              <td>{behavior}</td>
-              <td>{behaviorANames.includes(behavior) ? "Yes" : "No"}</td>
-              <td>{behaviorBNames.includes(behavior) ? "Yes" : "No"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    const uniqueVideoNames = Array.from(
+      new Set(codingsByBoth.map((coding) => coding.videoName))
     );
-  };
 
-  const renderCodingBehaviorsComparisonReversed = () => {
-    if (!codingA || !codingB) {
-      return null;
+    console.log("Codings evaluated by both:", codingsByBoth);
+    console.log("uniqueVideoNames:", uniqueVideoNames);
+
+    if (facilitatorBehaviors) {
+      let behaviorsToValidate = [];
+
+      facilitatorBehaviors.forEach((behavior) => {
+        behaviorsToValidate.push({
+          name: behavior.name,
+          id: behavior.id,
+          coder1: [],
+          coder2: [],
+        });
+      });
+
+      // Now we add the categories
+      behaviorsToValidate.push({
+        name: "Confort",
+        id: "confort",
+        coder1: [],
+        coder2: [],
+      });
+      behaviorsToValidate.push({
+        name: "Exhibit Use",
+        id: "exhibit-use",
+        coder1: [],
+        coder2: [],
+      });
+      behaviorsToValidate.push({
+        name: "Reflection",
+        id: "reflection",
+        coder1: [],
+        coder2: [],
+      });
+      behaviorsToValidate.push({
+        name: "Information",
+        id: "information",
+        coder1: [],
+        coder2: [],
+      });
+
+      // We loop each video and check
+      uniqueVideoNames.forEach((videoName) => {
+        const codingCoder1 = codingsByBoth.find(
+          (coding) =>
+            coding.videoName === videoName &&
+            coding.evaluatorName === evaluatorNameA
+        );
+        const codingCoder2 = codingsByBoth.find(
+          (coding) =>
+            coding.videoName === videoName &&
+            coding.evaluatorName === evaluatorNameB
+        );
+
+        if (!codingCoder1 || !codingCoder2) {
+          debugger;
+        }
+
+        let confortCoder1 = false;
+        let exhibitUseCoder1 = false;
+        let reflectionCoder1 = false;
+        let informationCoder1 = false;
+
+        let confortCoder2 = false;
+        let exhibitUseCoder2 = false;
+        let reflectionCoder2 = false;
+        let informationCoder2 = false;
+
+        behaviorsToValidate.forEach((behavior) => {
+          if (
+            !["confort", "exhibit-use", "reflection", "information"].includes(
+              behavior.id
+            )
+          ) {
+            // Coding behaviors that are not categories
+            const codingBehavior1 = codingCoder1.codingBehaviors.find(
+              (codingBehavior) => codingBehavior.id === behavior.id
+            );
+
+            const codingBehavior2 = codingCoder2.codingBehaviors.find(
+              (codingBehavior) => codingBehavior.id === behavior.id
+            );
+
+            behavior.coder1.push({
+              videoName: videoName,
+              found: codingBehavior1 ? true : false,
+            });
+            if (codingBehavior1) {
+              if (codingBehavior1.type === "Confort" && !confortCoder1) {
+                confortCoder1 = true;
+              }
+              if (codingBehavior1.type === "Exhibit Use" && !exhibitUseCoder1) {
+                exhibitUseCoder1 = true;
+              }
+              if (codingBehavior1.type === "Reflection" && !reflectionCoder1) {
+                reflectionCoder1 = true;
+              }
+              if (
+                codingBehavior1.type === "Information" &&
+                !informationCoder1
+              ) {
+                informationCoder1 = true;
+              }
+            }
+
+            behavior.coder2.push({
+              videoName: videoName,
+              found: codingBehavior2 ? true : false,
+            });
+            if (codingBehavior2) {
+              if (codingBehavior2.type === "Confort" && !confortCoder2) {
+                confortCoder2 = true;
+              }
+              if (codingBehavior2.type === "Exhibit Use" && !exhibitUseCoder2) {
+                exhibitUseCoder2 = true;
+              }
+              if (codingBehavior2.type === "Reflection" && !reflectionCoder2) {
+                reflectionCoder2 = true;
+              }
+              if (
+                codingBehavior2.type === "Information" &&
+                !informationCoder2
+              ) {
+                informationCoder2 = true;
+              }
+            }
+          }
+        });
+
+        // After all behaviors of this video have been checked, we review categories
+        behaviorsToValidate.forEach((behavior) => {
+          if (behavior.id === "confort") {
+            behavior.coder1.push({
+              videoName: videoName,
+              found: confortCoder1,
+            });
+            behavior.coder2.push({
+              videoName: videoName,
+              found: confortCoder2,
+            });
+          } else if (behavior.id === "exhibit-use") {
+            behavior.coder1.push({
+              videoName: videoName,
+              found: exhibitUseCoder1,
+            });
+            behavior.coder2.push({
+              videoName: videoName,
+              found: exhibitUseCoder2,
+            });
+          } else if (behavior.id === "reflection") {
+            behavior.coder1.push({
+              videoName: videoName,
+              found: reflectionCoder1,
+            });
+            behavior.coder2.push({
+              videoName: videoName,
+              found: reflectionCoder2,
+            });
+          } else if (behavior.id === "information") {
+            behavior.coder1.push({
+              videoName: videoName,
+              found: informationCoder1,
+            });
+            behavior.coder2.push({
+              videoName: videoName,
+              found: informationCoder2,
+            });
+          }
+        });
+      });
+
+      console.log("behaviorsToValidate", behaviorsToValidate);
+      debugger;
+      calculateKappaCohen(behaviorsToValidate);
     }
-
-    return (
-      <table>
-        <thead>
-          <tr>
-            <th>Coding B Behavior</th>
-          </tr>
-        </thead>
-        <tbody className="table-body">
-          {codingB.codingBehaviors.map((behaviorB, index) => (
-            <tr
-              key={index}
-              style={{
-                backgroundColor: "white",
-              }}
-            >
-              <td>
-                {behaviorB.name} - {behaviorB.type} - [{behaviorB.timeMarked} to{" "}
-                {behaviorB.timeEnded}]
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
   };
+
+  const calculateKappaCohen = (behaviors) => {
+    behaviors.forEach((behavior) => {
+      const clipsCoder1 = behavior.coder1;
+      const clipsCoder2 = behavior.coder2;
+
+      let totalClips = clipsCoder1.length;
+      let totalClipsYY = 0;
+      let totalClipsYN = 0;
+      let totalClipsNY = 0;
+      let totalClipsNN = 0;
+
+      for (let i = 0; i < totalClips; i++) {
+        const clipCoder1 = clipsCoder1[i];
+        const clipCoder2 = clipsCoder2[i];
+
+        if (clipCoder1.found && clipCoder2.found) {
+          totalClipsYY += 1;
+        } else if (clipCoder1.found && !clipCoder2.found) {
+          totalClipsYN += 1;
+        } else if (!clipCoder1.found && clipCoder2.found) {
+          totalClipsNY += 1;
+        } else if (!clipCoder1.found && !clipCoder2.found) {
+          totalClipsNN += 1;
+        }
+      }
+
+      const ty1 = totalClipsYY + totalClipsYN;
+      const ty2 = totalClipsYY + totalClipsNY;
+      const tn1 = totalClipsNY + totalClipsNN;
+      const tn2 = totalClipsYN + totalClipsNN;
+
+      const T = ty2 + tn2;
+      const T2 = ty1 + tn1;
+      // T and T2 should be as totalClips
+
+      const p0 = (totalClipsYY + totalClipsNN) / T;
+      const pe = (ty1 / T) * (ty2 / T) + (tn1 / T) * (tn2 / T);
+
+      // ((Ty1*Ty2) mas (Tn1*Tn2) ) / T cuadrado
+      const pe2 = (ty1 * ty2 + tn1 * tn2) / (T * T);
+
+      let kappa = (p0 - pe) / (1 - pe);
+      // Round to 3 decimals
+      kappa = Math.round(kappa * 1000) / 1000;
+      behavior.kappa = kappa;
+
+      // Wikipedias way
+      const a = totalClipsYY;
+      const b = totalClipsYN;
+      const c = totalClipsNY;
+      const d = totalClipsNN;
+
+      const p0_v2 = (a + d) / (a + b + c + d);
+      const pYes = ((a + b) / (a + b + c + d)) * ((a + c) / (a + b + c + d));
+      const pNo = ((c + d) / (a + b + c + d)) * ((b + d) / (a + b + c + d));
+      const pe_v2 = pYes + pNo;
+
+      let kappa_v2 = (p0_v2 - pe_v2) / (1 - pe_v2);
+      // Round to 3 decimals
+      kappa_v2 = Math.round(kappa_v2 * 1000) / 1000;
+      behavior.kappa2 = kappa_v2;
+    });
+    console.log("behaviors with Kappa", behaviors);
+    setBehaviosWithKappa(behaviors);
+  };
+
+  const isCalculateButtonEnabled = evaluatorNameA && evaluatorNameB;
 
   return (
     <div className="intercoder-wrapper">
-      <div className="intercoder-select">
-        <label>Select Video:</label>
-        <select value={selectedVideo} onChange={handleVideoSelect}>
-          <option value="">Select Video</option>
-          {videoNames.map((videoName, index) => (
-            <option key={index} value={videoName}>
-              {videoName}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {selectedVideo && (
-        <div>
-          <div className="intercoder-select">
-            <label>Select Coding A:</label>
-            <select
-              value={codingA ? codingA.id : ""}
-              onChange={handleCodingASelect}
-            >
-              <option value="">Select Coding A</option>
-              {filterCodingsByVideo(selectedVideo).map((coding, index) => (
-                <option key={index} value={coding.id}>
-                  {coding.evaluatorName} -{" "}
-                  {getDateStringFromTimestamp(coding.codedDate)}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="intercoder-select">
-            <label>Select Coding B:</label>
-            <select
-              value={codingB ? codingB.id : ""}
-              onChange={handleCodingBSelect}
-            >
-              <option value="">Select Coding B</option>
-              {filterCodingsByVideo(selectedVideo).map((coding, index) => (
-                <option key={index} value={coding.id}>
-                  {coding.evaluatorName} -{" "}
-                  {getDateStringFromTimestamp(coding.codedDate)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* <div>
-            <label>Delta Time:</label>
-            <input
-              type="number"
-              value={deltaTime}
-              onChange={(event) => setDeltaTime(event.target.value)}
-            />
-          </div> */}
-
-          <div>
-            <button
-              onClick={handleCalculateClick}
-              disabled={!isCalculateButtonEnabled}
-            >
-              Calculate
-            </button>
-          </div>
-
-          {interCoderReliability && (
-            <>
-              <div>
-                <h3>Intercoder Similarity: {interCoderReliability}%</h3>
-              </div>
-
-              {/* <div>
-                <h3>
-                  Intercoder Similarity ITE (Ignore Time Ended):{" "}
-                  {interCoderReliabilityITE}%
-                </h3>
-              </div> */}
-
-              {renderCodingBehaviorsComparison()}
-            </>
-          )}
+      <div>
+        <div className="intercoder-select">
+          <label>Select Coder 1:</label>
+          <select value={evaluatorNameA} onChange={handleCoderASelect}>
+            <option value="">Select Coder A</option>
+            {coderNames.map((coderName, index) => (
+              <option key={index} value={coderName}>
+                {coderName}
+              </option>
+            ))}
+          </select>
         </div>
-      )}
+        <div className="intercoder-select">
+          <label>Select Coder 2:</label>
+          <select value={evaluatorNameB} onChange={handleCoderBSelect}>
+            <option value="">Select Coder B</option>
+            {coderNames.map((coderName, index) => (
+              <option key={index} value={coderName}>
+                {coderName}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      {/* You can display the selected codingA and codingB if needed */}
+        <div className="intercoder-select" style={{ marginTop: "20px" }}>
+          <span className="option-title">Select exhibits</span>
+          <div style={{ color: "black", width: "400px" }}>
+            <Select
+              isMulti
+              name="exhibits"
+              value={selectedExhibits}
+              onChange={(selectedExhibits) =>
+                setSelectedExhibits(selectedExhibits)
+              }
+              options={exhibitOptions}
+              className="basic-multi-select"
+              classNamePrefix="select"
+            />
+          </div>
+        </div>
+
+        <div>
+          <button
+            onClick={handleCalculateClick}
+            disabled={!isCalculateButtonEnabled}
+          >
+            Calculate
+          </button>
+        </div>
+
+        {behaviorsWithKappa.length > 0 &&
+          behaviorsWithKappa.map((behavior, index) => (
+            <div key={behavior.id}>
+              <div>
+                Behavior: {behavior.name} - Kappa: {behavior.kappa} - Kappa v2:{" "}
+                {behavior.kappa2}
+              </div>
+            </div>
+          ))}
+
+        {/* {interCoderReliability && (
+          <>
+            <div>
+              <h3>Intercoder Similarity: {interCoderReliability}%</h3>
+            </div>
+          </>
+        )} */}
+      </div>
     </div>
   );
 }
 
 export default InterCoder;
-/*
-const InterCoder = () => {
-  const interCodersStore = useSelector((state) => state.interCoders);
-  const { videoNames, selectedVideo } = interCodersStore;
-  const dispatch = useDispatch();
-
-  const [videoOptions, setVideoOptions] = useState([]);
-
-  let currentVideoOption = null;
-  if (selectedVideo) {
-    currentVideoOption = {
-      value: selectedVideo,
-      label: selectedVideo,
-    };
-  }
-
-  // componentDidMount
-  useEffect(() => {
-    dispatch(loadVideoNames());
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (videoNames && videoNames.length > 0) {
-      const videos = videoNames.map((videoName) => ({
-        value: videoName,
-        label: videoName,
-      }));
-      setVideoOptions(videos);
-    }
-  }, [videoNames]);
-
-  const handleVideoChange = ({ value }) => {
-    if (value) {
-      dispatch(setSelectedVideo({ videoName: value }));
-    }
-  };
-
-  const handleCalculateClick = () => {
-    const intercoderSimilarity = calculateIntercoderSimilarity();
-    console.log(intercoderSimilarity);
-
-  }
-
-  return (
-    <div style={{ padding: "20px", textAlign: "center" }}>
-      <h1>Inter Coder Reliability</h1>
-
-      <h4>Select a video from the list of codings</h4>
-      <div className="selects-container">
-        <Select
-          placeholder="Select video"
-          options={videoOptions}
-          value={currentVideoOption}
-          onChange={handleVideoChange}
-        />
-      </div>
-    </div>
-  );
-};
-
-export default InterCoder;*/

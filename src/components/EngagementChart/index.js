@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getDocs, collection } from "firebase/firestore";
 import { ResponsiveBar } from "@nivo/bar";
+import Statistics from "statistics.js";
 import { useSelector } from "react-redux";
 
 import { db } from "../../config/firebase";
@@ -40,6 +41,9 @@ function GenericComparisonChart() {
   const [errorB, setErrorB] = useState("");
   const [data, setData] = useState(null);
 
+  const [chiSquared, setChiSquared] = useState("");
+  const [kendallsData, setKendallsData] = useState("");
+
   const exhibitsStore = useSelector((state) => state.exhibits);
   const { selectedExhibit } = exhibitsStore;
 
@@ -69,6 +73,10 @@ function GenericComparisonChart() {
     if (selectedExhibit && groupA && groupB) {
       setErrorA("");
       setErrorB("");
+
+      calculateChiSquared();
+      calculateKendallsTau();
+
       const percentageData = calculatePercentageData();
       console.log("percentageData", percentageData);
 
@@ -82,6 +90,70 @@ function GenericComparisonChart() {
       setData(dataForChart);
     }
   }, [selectedExhibit, groupA, groupB]);
+
+  const calculateChiSquared = () => {
+    let chiData = [];
+
+    for (const coding of codings) {
+      const codingLevel = calculateCodingLevel(coding.codingBehaviors);
+      const isGroupA = isCodingInGroup(coding, groupA);
+      const isGroupB = isCodingInGroup(coding, groupB);
+
+      if (isGroupA) {
+        chiData.push({
+          codingLevel: codingLevel,
+          group: "A",
+        });
+      } else if (isGroupB) {
+        chiData.push({
+          codingLevel: codingLevel,
+          group: "B",
+        });
+      }
+    }
+
+    const testVars = {
+      group: {
+        scale: "nominal",
+        valueMap: ["A", "B"],
+      },
+      codingLevel: {
+        scale: "ordinal",
+        valueMap: ["Initiation", "Transition", "Breakthrough"],
+      },
+    };
+
+    const stats = new Statistics(chiData, testVars);
+    const chiSquareAux = stats.chiSquaredTest("group", "codingLevel");
+    setChiSquared(JSON.stringify(chiSquareAux));
+    console.log("ChiSquared", chiSquareAux);
+  };
+
+  const calculateKendallsTau = () => {
+    let kendallsData = [];
+    debugger;
+    for (const coding of codings) {
+      const codingLevel = calculateCodingLevel(coding.codingBehaviors);
+      const isGroupA = isCodingInGroup(coding, groupA);
+      const isGroupB = isCodingInGroup(coding, groupB);
+
+      const codingLevelNumber =
+        codingLevel === "Initiation" ? 0 : codingLevel === "Transition" ? 1 : 2;
+      const groupNumber = isGroupA ? 0 : 1;
+      kendallsData.push({
+        group: groupNumber,
+        codingLevel: codingLevelNumber,
+      });
+    }
+
+    const testVars = { group: "ordinal", codingLevel: "ordinal" };
+
+    const stats = new Statistics(kendallsData, testVars);
+    const kendall = stats.kendallsTau("group", "codingLevel");
+
+    console.log("Kendall", kendall);
+    setKendallsData(JSON.stringify(kendall.b));
+  };
 
   // Calculate the percentage of each group that reached each coding level
   const calculatePercentageData = () => {
@@ -177,39 +249,49 @@ function GenericComparisonChart() {
       {data && (
         <>
           {codings.length > 0 ? (
-            <div
-              style={{
-                width: "100%",
-                height: "800px",
-                backgroundColor: "white",
-              }}
-            >
-              <ResponsiveBar
-                data={data}
-                keys={["Group A", "Group B"]}
-                indexBy="category"
-                margin={{ top: 20, right: 30, bottom: 150, left: 50 }}
-                groupMode="grouped"
-                // barComponent={CustomBar}
-                // labelFormat={format}
-                // tooltipFormat={format}
-                label={(d) => `${d.value} %`}
-                maxValue={100}
-                legends={[
-                  {
-                    dataFrom: "keys",
-                    anchor: "bottom",
-                    direction: "row",
-                    translateY: 80,
-                    itemWidth: 100,
-                    itemHeight: 20,
-                    itemsSpacing: 2,
-                    symbolSize: 20,
-                  },
-                ]}
-                // Configure other Nivo bar chart settings here
-              />
-            </div>
+            <>
+              <div
+                style={{
+                  width: "90%",
+                  height: "600px",
+                  backgroundColor: "white",
+                  margin: "auto",
+                }}
+              >
+                <ResponsiveBar
+                  data={data}
+                  keys={["Group A", "Group B"]}
+                  indexBy="category"
+                  margin={{ top: 20, right: 30, bottom: 150, left: 50 }}
+                  groupMode="grouped"
+                  // barComponent={CustomBar}
+                  // labelFormat={format}
+                  // tooltipFormat={format}
+                  label={(d) => `${d.value} %`}
+                  maxValue={100}
+                  legends={[
+                    {
+                      dataFrom: "keys",
+                      anchor: "bottom",
+                      direction: "row",
+                      translateY: 80,
+                      itemWidth: 100,
+                      itemHeight: 20,
+                      itemsSpacing: 2,
+                      symbolSize: 20,
+                    },
+                  ]}
+                  // Configure other Nivo bar chart settings here
+                />
+              </div>
+              <div>
+                VEP - ChiSquaredTest
+                <div>Result: {chiSquared}</div>
+              </div>
+              <div>
+                VEP - KendallsTau B<div>Result: {kendallsData}</div>
+              </div>
+            </>
           ) : (
             <p>No codings in this exhibit</p>
           )}
