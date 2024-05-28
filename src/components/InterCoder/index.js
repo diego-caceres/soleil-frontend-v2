@@ -18,6 +18,13 @@ import {
   findSimilarBehavior,
 } from "src/utils";
 
+const behaviorTypesEnum = {
+  confort: "Confort",
+  exhibitUse: "Exhibit Use",
+  reflection: "Reflection",
+  information: "Information",
+};
+
 function InterCoder() {
   const dispatch = useDispatch();
   const [codings, setCodings] = useState([]);
@@ -32,7 +39,12 @@ function InterCoder() {
   const [exhibitOptions, setExhibitOptions] = useState([]);
   const [selectedExhibits, setSelectedExhibits] = useState([]);
 
+  const [uniqueVideoNamesDebug, setUniqueVideoNamesDebug] = useState([]);
   const [behaviorsWithKappa, setBehaviosWithKappa] = useState([]);
+  const [confortRow, setConfortRow] = useState([]);
+  const [exhibitUseRow, setExhibitUseRow] = useState([]);
+  const [reflectionRow, setReflectionRow] = useState([]);
+  const [informationRow, setInformationRow] = useState([]);
 
   const exhibitsStore = useSelector((state) => state.exhibits);
   const { list: exhibitsList } = exhibitsStore;
@@ -148,6 +160,7 @@ function InterCoder() {
 
     console.log("Codings evaluated by both:", codingsByBoth);
     console.log("uniqueVideoNames:", uniqueVideoNames);
+    setUniqueVideoNamesDebug(uniqueVideoNames);
 
     if (facilitatorBehaviors) {
       let behaviorsToValidate = [];
@@ -156,35 +169,45 @@ function InterCoder() {
         behaviorsToValidate.push({
           name: behavior.name,
           id: behavior.id,
+          type: behavior.type,
           coder1: [],
           coder2: [],
+          isCategory: false,
         });
       });
 
       // Now we add the categories
       behaviorsToValidate.push({
         name: "Confort",
+        type: "Confort",
         id: "confort",
         coder1: [],
         coder2: [],
+        isCategory: true,
       });
       behaviorsToValidate.push({
         name: "Exhibit Use",
+        type: "Exhibit Use",
         id: "exhibit-use",
         coder1: [],
         coder2: [],
+        isCategory: true,
       });
       behaviorsToValidate.push({
         name: "Reflection",
+        type: "Reflection",
         id: "reflection",
         coder1: [],
         coder2: [],
+        isCategory: true,
       });
       behaviorsToValidate.push({
         name: "Information",
+        type: "Information",
         id: "information",
         coder1: [],
         coder2: [],
+        isCategory: true,
       });
 
       // We loop each video and check
@@ -215,11 +238,7 @@ function InterCoder() {
         let informationCoder2 = false;
 
         behaviorsToValidate.forEach((behavior) => {
-          if (
-            !["confort", "exhibit-use", "reflection", "information"].includes(
-              behavior.id
-            )
-          ) {
+          if (!behavior.isCategory) {
             // Coding behaviors that are not categories
             const codingBehavior1 = codingCoder1.codingBehaviors.find(
               (codingBehavior) => codingBehavior.id === behavior.id
@@ -234,17 +253,26 @@ function InterCoder() {
               found: codingBehavior1 ? true : false,
             });
             if (codingBehavior1) {
-              if (codingBehavior1.type === "Confort" && !confortCoder1) {
+              if (
+                codingBehavior1.type === behaviorTypesEnum.confort &&
+                !confortCoder1
+              ) {
                 confortCoder1 = true;
               }
-              if (codingBehavior1.type === "Exhibit Use" && !exhibitUseCoder1) {
+              if (
+                codingBehavior1.type === behaviorTypesEnum.exhibitUse &&
+                !exhibitUseCoder1
+              ) {
                 exhibitUseCoder1 = true;
               }
-              if (codingBehavior1.type === "Reflection" && !reflectionCoder1) {
+              if (
+                codingBehavior1.type === behaviorTypesEnum.reflection &&
+                !reflectionCoder1
+              ) {
                 reflectionCoder1 = true;
               }
               if (
-                codingBehavior1.type === "Information" &&
+                codingBehavior1.type === behaviorTypesEnum.information &&
                 !informationCoder1
               ) {
                 informationCoder1 = true;
@@ -256,17 +284,26 @@ function InterCoder() {
               found: codingBehavior2 ? true : false,
             });
             if (codingBehavior2) {
-              if (codingBehavior2.type === "Confort" && !confortCoder2) {
+              if (
+                codingBehavior2.type === behaviorTypesEnum.confort &&
+                !confortCoder2
+              ) {
                 confortCoder2 = true;
               }
-              if (codingBehavior2.type === "Exhibit Use" && !exhibitUseCoder2) {
+              if (
+                codingBehavior2.type === behaviorTypesEnum.exhibitUse &&
+                !exhibitUseCoder2
+              ) {
                 exhibitUseCoder2 = true;
               }
-              if (codingBehavior2.type === "Reflection" && !reflectionCoder2) {
+              if (
+                codingBehavior2.type === behaviorTypesEnum.reflection &&
+                !reflectionCoder2
+              ) {
                 reflectionCoder2 = true;
               }
               if (
-                codingBehavior2.type === "Information" &&
+                codingBehavior2.type === behaviorTypesEnum.information &&
                 !informationCoder2
               ) {
                 informationCoder2 = true;
@@ -277,7 +314,10 @@ function InterCoder() {
 
         // After all behaviors of this video have been checked, we review categories
         behaviorsToValidate.forEach((behavior) => {
-          if (behavior.id === "confort") {
+          if (
+            behavior.isCategory &&
+            behavior.type === behaviorTypesEnum.confort
+          ) {
             behavior.coder1.push({
               videoName: videoName,
               found: confortCoder1,
@@ -286,7 +326,10 @@ function InterCoder() {
               videoName: videoName,
               found: confortCoder2,
             });
-          } else if (behavior.id === "exhibit-use") {
+          } else if (
+            behavior.isCategory &&
+            behavior.type === behaviorTypesEnum.exhibitUse
+          ) {
             behavior.coder1.push({
               videoName: videoName,
               found: exhibitUseCoder1,
@@ -295,7 +338,10 @@ function InterCoder() {
               videoName: videoName,
               found: exhibitUseCoder2,
             });
-          } else if (behavior.id === "reflection") {
+          } else if (
+            behavior.isCategory &&
+            behavior.type === behaviorTypesEnum.reflection
+          ) {
             behavior.coder1.push({
               videoName: videoName,
               found: reflectionCoder1,
@@ -304,7 +350,10 @@ function InterCoder() {
               videoName: videoName,
               found: reflectionCoder2,
             });
-          } else if (behavior.id === "information") {
+          } else if (
+            behavior.isCategory &&
+            behavior.type === behaviorTypesEnum.information
+          ) {
             behavior.coder1.push({
               videoName: videoName,
               found: informationCoder1,
@@ -349,25 +398,25 @@ function InterCoder() {
         }
       }
 
-      const ty1 = totalClipsYY + totalClipsYN;
-      const ty2 = totalClipsYY + totalClipsNY;
-      const tn1 = totalClipsNY + totalClipsNN;
-      const tn2 = totalClipsYN + totalClipsNN;
+      // const ty1 = totalClipsYY + totalClipsYN;
+      // const ty2 = totalClipsYY + totalClipsNY;
+      // const tn1 = totalClipsNY + totalClipsNN;
+      // const tn2 = totalClipsYN + totalClipsNN;
 
-      const T = ty2 + tn2;
-      const T2 = ty1 + tn1;
-      // T and T2 should be as totalClips
+      // const T = ty2 + tn2;
+      // const T2 = ty1 + tn1;
+      // // T and T2 should be as totalClips
 
-      const p0 = (totalClipsYY + totalClipsNN) / T;
-      const pe = (ty1 / T) * (ty2 / T) + (tn1 / T) * (tn2 / T);
+      // const p0 = (totalClipsYY + totalClipsNN) / T;
+      // const pe = (ty1 / T) * (ty2 / T) + (tn1 / T) * (tn2 / T);
 
-      // ((Ty1*Ty2) mas (Tn1*Tn2) ) / T cuadrado
-      const pe2 = (ty1 * ty2 + tn1 * tn2) / (T * T);
+      // // ((Ty1*Ty2) mas (Tn1*Tn2) ) / T cuadrado
+      // const pe2 = (ty1 * ty2 + tn1 * tn2) / (T * T);
 
-      let kappa = (p0 - pe) / (1 - pe);
-      // Round to 3 decimals
-      kappa = Math.round(kappa * 1000) / 1000;
-      behavior.kappa = kappa;
+      // let kappa = (p0 - pe) / (1 - pe);
+      // // Round to 3 decimals
+      // kappa = Math.round(kappa * 1000) / 1000;
+      // behavior.kappa = kappa;
 
       // Wikipedias way
       const a = totalClipsYY;
@@ -380,13 +429,61 @@ function InterCoder() {
       const pNo = ((c + d) / (a + b + c + d)) * ((b + d) / (a + b + c + d));
       const pe_v2 = pYes + pNo;
 
-      let kappa_v2 = (p0_v2 - pe_v2) / (1 - pe_v2);
-      // Round to 3 decimals
-      kappa_v2 = Math.round(kappa_v2 * 1000) / 1000;
-      behavior.kappa2 = kappa_v2;
+      const agreementPercentage = ((a + d) * 100) / (a + b + c + d);
+      behavior.agreementPercentage = agreementPercentage;
+
+      if (a === 0 || d === 0) {
+        // No se puede calcular Kappa de Cohen
+        behavior.kappa = "N / A";
+      } else {
+        let kappa_v2 = (p0_v2 - pe_v2) / (1 - pe_v2);
+        // Round to 3 decimals
+        kappa_v2 = Math.round(kappa_v2 * 1000) / 1000;
+        // behavior.kappa2 = kappa_v2;
+        behavior.kappa = kappa_v2;
+      }
     });
+
     console.log("behaviors with Kappa", behaviors);
     setBehaviosWithKappa(behaviors);
+
+    const auxConfort = behaviors.filter(
+      (b) => b.type === behaviorTypesEnum.confort
+    );
+    const auxExhibitUse = behaviors.filter(
+      (b) => b.type === behaviorTypesEnum.exhibitUse
+    );
+    const auxReflection = behaviors.filter(
+      (b) => b.type === behaviorTypesEnum.reflection
+    );
+    const auxInformation = behaviors.filter(
+      (b) => b.type === behaviorTypesEnum.information
+    );
+
+    setConfortRow(auxConfort);
+    setExhibitUseRow(auxExhibitUse);
+    setReflectionRow(auxReflection);
+    setInformationRow(auxInformation);
+  };
+
+  const getKappaColor = (kappa) => {
+    if (isNaN(kappa)) {
+      return "#000000";
+    }
+
+    if (kappa >= 0.8) {
+      return "#6fa8dc";
+    } else if (kappa >= 0.6) {
+      return "#00c68a";
+    } else if (kappa >= 0.4) {
+      return "#f9b726";
+    } else if (kappa >= 0.2) {
+      return "#f9911c";
+    } else if (kappa >= 0) {
+      return "#ea4335";
+    } else {
+      return "#762e2f";
+    }
   };
 
   const isCalculateButtonEnabled = evaluatorNameA && evaluatorNameB;
@@ -443,7 +540,7 @@ function InterCoder() {
           </button>
         </div>
 
-        {behaviorsWithKappa.length > 0 &&
+        {/* {behaviorsWithKappa.length > 0 &&
           behaviorsWithKappa.map((behavior, index) => (
             <div key={behavior.id}>
               <div>
@@ -451,7 +548,118 @@ function InterCoder() {
                 {behavior.kappa2}
               </div>
             </div>
-          ))}
+          ))} */}
+
+        {behaviorsWithKappa.length > 0 && (
+          <>
+            <div className="behavior-row">
+              {confortRow.map((behavior, index) => {
+                const kappaColor = getKappaColor(behavior.kappa);
+                return (
+                  <div
+                    key={`${index}-${behavior.name}`}
+                    className="behavior-cell"
+                  >
+                    <div className="behavior-row-name">{behavior.name}</div>
+                    <div className="behavior-row-data">
+                      Agreement: {behavior.agreementPercentage.toFixed(2)}%
+                    </div>
+                    <div
+                      className="behavior-row-data"
+                      style={{ backgroundColor: kappaColor }}
+                    >
+                      Kappa: {behavior.kappa}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="behavior-row">
+              {exhibitUseRow.map((behavior, index) => {
+                const kappaColor = getKappaColor(behavior.kappa);
+                return (
+                  <div
+                    key={`${index}-${behavior.name}`}
+                    className="behavior-cell"
+                  >
+                    <div className="behavior-row-name">{behavior.name}</div>
+                    <div className="behavior-row-data">
+                      Agreement: {behavior.agreementPercentage.toFixed(2)}%
+                    </div>
+                    <div
+                      className="behavior-row-data"
+                      style={{ backgroundColor: kappaColor }}
+                    >
+                      Kappa: {behavior.kappa}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="behavior-row">
+              {reflectionRow.map((behavior, index) => {
+                const kappaColor = getKappaColor(behavior.kappa);
+                return (
+                  <div
+                    key={`${index}-${behavior.name}`}
+                    className="behavior-cell"
+                  >
+                    <div className="behavior-row-name">{behavior.name}</div>
+                    <div className="behavior-row-data">
+                      Agreement: {behavior.agreementPercentage.toFixed(2)}%
+                    </div>
+                    <div
+                      className="behavior-row-data"
+                      style={{ backgroundColor: kappaColor }}
+                    >
+                      Kappa: {behavior.kappa}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="behavior-row">
+              {informationRow.map((behavior, index) => {
+                const kappaColor = getKappaColor(behavior.kappa);
+                return (
+                  <div
+                    key={`${index}-${behavior.name}`}
+                    className="behavior-cell"
+                  >
+                    <div className="behavior-row-name">{behavior.name}</div>
+                    <div className="behavior-row-data">
+                      Agreement: {behavior.agreementPercentage.toFixed(2)}%
+                    </div>
+                    <div
+                      className="behavior-row-data"
+                      style={{ backgroundColor: kappaColor }}
+                    >
+                      Kappa: {behavior.kappa}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        {behaviorsWithKappa.length > 0 && uniqueVideoNamesDebug.length > 0 && (
+          <>
+            List of Unique Videos:
+            <div>
+              {uniqueVideoNamesDebug.map((videoName, index) => {
+                return (
+                  <div key={index}>
+                    <span>{videoName}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
 
         {/* {interCoderReliability && (
           <>
