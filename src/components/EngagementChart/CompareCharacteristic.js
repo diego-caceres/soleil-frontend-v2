@@ -109,7 +109,7 @@ function GenericComparisonChart() {
 
   return (
     <div>
-      <h1>Generic Comparison Chart</h1>
+      <h1>Visitor Engagement Profile</h1>
       <label>Select Comparing Characteristic:</label>
       <select
         value={selectedCharacteristic}

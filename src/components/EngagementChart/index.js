@@ -223,7 +223,7 @@ function GenericComparisonChart() {
 
   return (
     <div className="engagement-chart-container">
-      <span className="page-title">Generic Comparison Chart</span>
+      <span className="page-title">Visitor Engagement Profile</span>
 
       <div className="initial-row">
         <>

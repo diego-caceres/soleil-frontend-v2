@@ -12,6 +12,9 @@ import {
   genderOptions,
   ageOptions,
   groupOptions,
+  educationOptions,
+  familiarityOptions,
+  typeOptions,
   languageOptions,
   dayStatusOptions,
 } from "src/constants";
@@ -33,6 +36,10 @@ const CodingLive = () => {
   const [gender, setGender] = useState(null);
   const [ageRange, setAgeRange] = useState(null);
   const [amount, setAmount] = useState(null);
+  const [educationLevel, setEducationLevel] = useState(null);
+  const [familiarity, setFamiliarity] = useState(null);
+  const [typeOfVisitor, setTypeOfVisitor] = useState(null);
+
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState({
     value: "spanish",
@@ -188,6 +195,11 @@ const CodingLive = () => {
             typeOfGroup: amount.value,
             description: description,
             language: language.value,
+            educationLevel: educationLevel?.value || "",
+            familiarity: familiarity?.value || "",
+            typeOfVisitor: typeOfVisitor
+              ? typeOfVisitor.map((tov) => tov.value).join(", ")
+              : "",
           },
           showFacilitator: showFacilitator,
           facilitator: {
@@ -269,19 +281,18 @@ const CodingLive = () => {
           </div>
           <div className="second-row">
             <div className="visitor-row">
-              <input
+              <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                type="text"
-                placeholder="visitor description"
+                placeholder="Visitor description"
               />
             </div>
             <div className="observation-row">
-              <input
+              <textarea
                 value={observations}
                 onChange={(e) => setObservations(e.target.value)}
                 type="text"
-                placeholder="observations"
+                placeholder="Observations"
               />
             </div>
           </div>
@@ -320,6 +331,33 @@ const CodingLive = () => {
               options={dayStatusOptions}
               onChange={setDayStatus}
             />
+          </div>
+          <div className="fourth-row">
+            <div className="select-container">
+              <Select
+                placeholder="Education Level"
+                options={educationOptions}
+                value={educationLevel}
+                onChange={setEducationLevel}
+              />
+            </div>
+            <div className="select-container">
+              <Select
+                placeholder="Familiatiry"
+                options={familiarityOptions}
+                value={familiarity}
+                onChange={setFamiliarity}
+              />
+            </div>
+            <div className="select-container">
+              <Select
+                isMulti={true}
+                placeholder="Type of Visitor"
+                value={typeOfVisitor}
+                options={typeOptions}
+                onChange={setTypeOfVisitor}
+              />
+            </div>
           </div>
         </div>
         <div className="facilitator-section">

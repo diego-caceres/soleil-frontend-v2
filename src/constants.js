@@ -21,6 +21,34 @@ export const groupOptions = [
   { value: "3+people", label: "3+ people" },
 ];
 
+export const educationOptions = [
+  { value: "no-schooling-completed", label: "No schooling completed" },
+  { value: "primary-school-completed", label: "Primary school completed" },
+  {
+    value: "secondary-school-incomplete",
+    label: "Secondary school incomplete",
+  },
+  { value: "secondary-school-completed", label: "Secondary school completed" },
+  { value: "terciary-school-incomplete", label: "Terciary school incomplete" },
+  { value: "terciary-school-completed", label: "Terciary school completed" },
+  { value: "posgraduate-degree", label: "Posgraduate degree" },
+];
+
+export const familiarityOptions = [
+  { value: "first-time", label: "First time" },
+  { value: "once-year", label: "Once a year or less" },
+  { value: "2-4-times-year", label: "2-4 times a year" },
+  { value: "5+times-year", label: "5+ times a year" },
+];
+
+export const typeOptions = [
+  { value: "explorer", label: "Explorer" },
+  { value: "facilitator", label: "Facilitator" },
+  { value: "experience-seeker", label: "Experience seeker" },
+  { value: "hobbyist-professional", label: "Hobbyist / Professional" },
+  { value: "recharger", label: "Recharger" },
+];
+
 export const languageOptions = [
   { value: "spanish", label: "Spanish" },
   { value: "english", label: "English" },

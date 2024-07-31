@@ -7,13 +7,21 @@
   // background-size: cover;
   background-color: #b36b55;
   width: 100%;
-  height: 105%;
+  height: calc(100vh - 100px);
   
   display: flex;
   flex-direction: column;
 
   @media (max-width: 1200px) {
     font-size: 13px;
+  }
+
+  textarea {
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    height: 100%;
+    padding: 15px;
   }
 
   .top-half {
@@ -91,13 +99,13 @@
       
         .visitor-row {
           flex: 1 1 40%; /*grow | shrink | basis */
-          height: 100%;
+          height: 100px;
           margin-right: 10px;
         }
 
         .observation-row {
           flex: 1 1 40%; /*grow | shrink | basis */
-          height: 100%;
+          height: 100px;
           margin-left: 10px;
         }
       }
@@ -107,7 +115,16 @@
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
+        padding: 0 20px;
+      }
+      .fourth-row {
+        margin-top: 5px;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 10px;
+        margin-bottom: 10px;
         padding: 0 20px;
       }
     }

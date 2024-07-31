@@ -12,6 +12,9 @@ import {
   genderOptions,
   ageOptions,
   groupOptions,
+  educationOptions,
+  familiarityOptions,
+  typeOptions,
   languageOptions,
   dayStatusOptions,
 } from "src/constants";
@@ -28,6 +31,10 @@ const CodingVideo = () => {
   const [gender, setGender] = useState(null);
   const [ageRange, setAgeRange] = useState(null);
   const [amount, setAmount] = useState(null);
+  const [educationLevel, setEducationLevel] = useState(null);
+  const [familiarity, setFamiliarity] = useState(null);
+  const [typeOfVisitor, setTypeOfVisitor] = useState(null);
+
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState({
     value: "spanish",
@@ -192,6 +199,7 @@ const CodingVideo = () => {
 
   const sendCodingToBackend = (callback) => {
     const videoDuration = playerRef.current.getDuration();
+
     dispatch(
       saveCoding(
         {
@@ -207,6 +215,11 @@ const CodingVideo = () => {
             typeOfGroup: amount.value,
             description: description,
             language: language.value,
+            educationLevel: educationLevel?.value || "",
+            familiarity: familiarity?.value || "",
+            typeOfVisitor: typeOfVisitor
+              ? typeOfVisitor.map((tov) => tov.value).join(", ")
+              : "",
           },
           showFacilitator: showFacilitator,
           facilitator: {
@@ -288,29 +301,60 @@ const CodingVideo = () => {
 
           <div className="characteristics-section">
             <span className="title">Visitor</span>
-            <div className="select-container">
-              <Select
-                placeholder="Gender"
-                options={genderOptions}
-                value={gender}
-                onChange={setGender}
-              />
-            </div>
-            <div className="select-container">
-              <Select
-                placeholder="Age"
-                options={ageOptions}
-                value={ageRange}
-                onChange={setAgeRange}
-              />
-            </div>
+            <div className="visitor-selects">
+              <div className="visitor-selects-col">
+                <div className="select-container">
+                  <Select
+                    placeholder="Gender"
+                    options={genderOptions}
+                    value={gender}
+                    onChange={setGender}
+                  />
+                </div>
+                <div className="select-container">
+                  <Select
+                    placeholder="Age"
+                    options={ageOptions}
+                    value={ageRange}
+                    onChange={setAgeRange}
+                  />
+                </div>
 
+                <div className="select-container">
+                  <Select
+                    placeholder="Group"
+                    value={amount}
+                    options={groupOptions}
+                    onChange={setAmount}
+                  />
+                </div>
+              </div>
+              <div className="visitor-selects-col">
+                <div className="select-container">
+                  <Select
+                    placeholder="Education Level"
+                    options={educationOptions}
+                    value={educationLevel}
+                    onChange={setEducationLevel}
+                  />
+                </div>
+                <div className="select-container">
+                  <Select
+                    placeholder="Familiatiry"
+                    options={familiarityOptions}
+                    value={familiarity}
+                    onChange={setFamiliarity}
+                  />
+                </div>
+              </div>
+            </div>
             <div className="select-container">
               <Select
-                placeholder="Group"
-                value={amount}
-                options={groupOptions}
-                onChange={setAmount}
+                isMulti={true}
+                placeholder="Type of Visitor"
+                value={typeOfVisitor}
+                options={typeOptions}
+                onChange={setTypeOfVisitor}
               />
             </div>
 
@@ -329,24 +373,6 @@ const CodingVideo = () => {
                 options={ageOptions}
                 value={facilitatorAgeRange}
                 onChange={setFacilitatorAgeRange}
-              />
-            </div>
-
-            <span className="title">General</span>
-            <div className="select-container">
-              <Select
-                placeholder="Language"
-                value={language}
-                options={languageOptions}
-                onChange={setLanguage}
-              />
-            </div>
-            <div className="select-container">
-              <Select
-                placeholder="Day Status"
-                value={dayStatus}
-                options={dayStatusOptions}
-                onChange={setDayStatus}
               />
             </div>
           </div>
@@ -512,78 +538,99 @@ const CodingVideo = () => {
       </div>
 
       <div className="finish-section">
-        <div className="list-interactions-section">
-          <div className="title-row">
-            <h2>List of interactions</h2>
+        <div className="finish-section-tile">
+          <div className="list-interactions-section">
+            <div className="title-row">
+              <h2>List of interactions</h2>
+            </div>
+            <div className="list-row">
+              {codingBehaviors.length === 0 ? (
+                <p>No interactions added yet</p>
+              ) : (
+                codingBehaviors.map((codingBehavior, codingIndex) => {
+                  const {
+                    name,
+                    forVisitor,
+                    forFacilitator,
+                    timeMarked,
+                    timeEnded,
+                  } = codingBehavior;
+                  let timeRange = `at ${toHHMMSS(timeMarked)}`;
+                  if (timeEnded) {
+                    timeRange = `${timeRange} until ${toHHMMSS(timeEnded)}`;
+                  }
+                  return (
+                    <div key={codingIndex}>
+                      {forVisitor && <span>Visitor => </span>}
+                      {forFacilitator && <span>Facilitator => </span>}
+                      {name}{" "}
+                      <button onClick={() => goToVideoAt(timeMarked)}>
+                        {" "}
+                        {`[${timeRange}]`}{" "}
+                      </button>
+                      -{" "}
+                      <button onClick={() => removeCoding(codingIndex)}>
+                        {" "}
+                        X{" "}
+                      </button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
-          <div className="list-row">
-            {codingBehaviors.length === 0 ? (
-              <p>No interactions added yet</p>
-            ) : (
-              codingBehaviors.map((codingBehavior, codingIndex) => {
-                const {
-                  name,
-                  forVisitor,
-                  forFacilitator,
-                  timeMarked,
-                  timeEnded,
-                } = codingBehavior;
-                let timeRange = `at ${toHHMMSS(timeMarked)}`;
-                if (timeEnded) {
-                  timeRange = `${timeRange} until ${toHHMMSS(timeEnded)}`;
-                }
-                return (
-                  <div key={codingIndex}>
-                    {forVisitor && <span>Visitor => </span>}
-                    {forFacilitator && <span>Facilitator => </span>}
-                    {name}{" "}
-                    <button onClick={() => goToVideoAt(timeMarked)}>
-                      {" "}
-                      {`[${timeRange}]`}{" "}
-                    </button>
-                    -{" "}
-                    <button onClick={() => removeCoding(codingIndex)}>
-                      {" "}
-                      X{" "}
-                    </button>
-                  </div>
-                );
-              })
-            )}
+          <div className="description-container">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Visitor description"
+            />
           </div>
-        </div>
-        <div className="description-container">
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Visitor description"
-          />
-        </div>
 
-        <div className="observation-container">
-          <textarea
-            value={observations}
-            onChange={(e) => setObservations(e.target.value)}
-            type="text"
-            placeholder="Observations"
-          />
-        </div>
+          <div className="observation-container">
+            <textarea
+              value={observations}
+              onChange={(e) => setObservations(e.target.value)}
+              type="text"
+              placeholder="Observations"
+            />
+          </div>
 
-        <div className="nextSteps">
-          <button
-            className="end-buttons-new"
-            onClick={onNewVisitorClicked}
-            disabled={savingCoding}
-          >
-            New visitor
-          </button>
-          <button
-            className="end-buttons-end"
-            onClick={onEndClicked}
-            disabled={savingCoding}
-          >
-            END
-          </button>
+          <div className="general-container">
+            <div className="select-container">
+              <Select
+                placeholder="Language"
+                value={language}
+                options={languageOptions}
+                onChange={setLanguage}
+              />
+            </div>
+            <div className="select-container">
+              <Select
+                placeholder="Day Status"
+                value={dayStatus}
+                options={dayStatusOptions}
+                onChange={setDayStatus}
+              />
+            </div>
+          </div>
+
+          <div className="nextSteps">
+            <button
+              className="end-buttons-new"
+              onClick={onNewVisitorClicked}
+              disabled={savingCoding}
+            >
+              New visitor
+            </button>
+            <button
+              className="end-buttons-end"
+              onClick={onEndClicked}
+              disabled={savingCoding}
+            >
+              END
+            </button>
+          </div>
         </div>
       </div>
 

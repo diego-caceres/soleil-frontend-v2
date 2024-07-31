@@ -53,7 +53,7 @@
         text-align: center;
         grid-area: video;
         padding: 10px;
-        margin: 15px 20px;
+        margin: 15px;
         flex: 1;
 
         border-radius: 24px;
@@ -61,20 +61,29 @@
       }
 
       .characteristics-section {
-        margin: 15px 20px;
+        margin: 15px;
         padding: 20px;
         display: flex;
         flex-direction: column;
-        width: 250px;
+        width: 390px;
         border-radius: 24px;
         background: #161717;
+
+        .visitor-selects {
+          display: flex;
+          flex-direction: row;
+          gap: 10px;
+          
+          .visitor-selects-col {
+            flex: 1;
+          }
+        }
 
         .title {
           color: white;
           font-size: 16px;
           font-style: normal;
           font-weight: 700;
-          margin-bottom: 10px;
         }
 
         .select-container {
@@ -221,13 +230,19 @@
     }
   }
 
-  .finish-section { 
-    height: calc(100vh - 145px);
+  .finish-section {
+    height: calc(100vh - 100px);
     display: flex;
     flex-direction: column;
-    border-radius: 24px;
-    background: #161717;
-    margin: 15px 20px;
+    padding: 15px 0px;
+    
+    .finish-section-tile {
+      border-radius: 24px;
+      background: #161717;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
 
     .list-interactions-section {
       flex: 1;
@@ -266,6 +281,18 @@
     .observation-container {
       padding: 10px 30px;
       height: 150px;
+    }
+
+    .general-container {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      padding: 10px 30px;
+
+      .select-container {
+        flex: 1;
+        color: black;
+      }
     }
 
     
