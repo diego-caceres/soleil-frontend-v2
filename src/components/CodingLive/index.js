@@ -15,6 +15,7 @@ import {
   educationOptions,
   familiarityOptions,
   typeOptions,
+  conditionOptions,
   languageOptions,
   dayStatusOptions,
 } from "src/constants";
@@ -39,6 +40,7 @@ const CodingLive = () => {
   const [educationLevel, setEducationLevel] = useState(null);
   const [familiarity, setFamiliarity] = useState(null);
   const [typeOfVisitor, setTypeOfVisitor] = useState(null);
+  const [condition, setCondition] = useState(null);
 
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState({
@@ -200,6 +202,7 @@ const CodingLive = () => {
             typeOfVisitor: typeOfVisitor
               ? typeOfVisitor.map((tov) => tov.value).join(", ")
               : "",
+            condition: condition?.value || "",
           },
           showFacilitator: showFacilitator,
           facilitator: {
@@ -356,6 +359,14 @@ const CodingLive = () => {
                 value={typeOfVisitor}
                 options={typeOptions}
                 onChange={setTypeOfVisitor}
+              />
+            </div>
+            <div className="select-container" style={{ minWidth: "130px" }}>
+              <Select
+                placeholder="Condition"
+                value={condition}
+                options={conditionOptions}
+                onChange={setCondition}
               />
             </div>
           </div>

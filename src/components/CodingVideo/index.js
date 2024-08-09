@@ -15,6 +15,7 @@ import {
   educationOptions,
   familiarityOptions,
   typeOptions,
+  conditionOptions,
   languageOptions,
   dayStatusOptions,
 } from "src/constants";
@@ -34,6 +35,7 @@ const CodingVideo = () => {
   const [educationLevel, setEducationLevel] = useState(null);
   const [familiarity, setFamiliarity] = useState(null);
   const [typeOfVisitor, setTypeOfVisitor] = useState(null);
+  const [condition, setCondition] = useState(null);
 
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState({
@@ -220,6 +222,7 @@ const CodingVideo = () => {
             typeOfVisitor: typeOfVisitor
               ? typeOfVisitor.map((tov) => tov.value).join(", ")
               : "",
+            condition: condition?.value || "",
           },
           showFacilitator: showFacilitator,
           facilitator: {
@@ -344,6 +347,14 @@ const CodingVideo = () => {
                     options={familiarityOptions}
                     value={familiarity}
                     onChange={setFamiliarity}
+                  />
+                </div>
+                <div className="select-container">
+                  <Select
+                    placeholder="Condition"
+                    value={condition}
+                    options={conditionOptions}
+                    onChange={setCondition}
                   />
                 </div>
               </div>

@@ -49,6 +49,13 @@ export const typeOptions = [
   { value: "recharger", label: "Recharger" },
 ];
 
+export const conditionOptions = [
+  { value: "n/a", label: "N/A" },
+  { value: "condition-1", label: "Condition 1" },
+  { value: "condition-2", label: "Condition 2" },
+  { value: "condition-3", label: "Condition 3" },
+];
+
 export const languageOptions = [
   { value: "spanish", label: "Spanish" },
   { value: "english", label: "English" },
