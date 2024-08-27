@@ -54,6 +54,12 @@ const CodingStart = () => {
         <button onClick={() => navigate("/inter-coder")} className="inter-btn">
           Inter-rater reliability
         </button>
+        <button
+          onClick={() => navigate("/download-data")}
+          className="download-btn"
+        >
+          Download Codings Data
+        </button>
       </div>
 
       {/* <Link to="/codings">
