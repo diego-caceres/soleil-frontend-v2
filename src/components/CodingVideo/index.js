@@ -170,28 +170,28 @@ const CodingVideo = () => {
     }
 
     if (!gender || gender.value.length === 0) {
-      alert("You have to select the visitor gender!");
+      alert("You have to select the visitor's gender!");
       return false;
     }
 
     if (!ageRange || ageRange.value.length === 0) {
-      alert("You have to select the visitor age!");
+      alert("You have to select the visitor's age!");
       return false;
     }
 
     if (!amount || amount.value.length === 0) {
-      alert("You have to select the visitors amount!");
+      alert("You have to select the type of group!");
       return false;
     }
 
     if (showFacilitator) {
       if (!facilitatorGender || facilitatorGender.value.length === 0) {
-        alert("You have to select the facilitator gender!");
+        alert("You have to select the facilitator's gender!");
         return false;
       }
 
       if (!facilitatorAgeRange || facilitatorAgeRange.value.length === 0) {
-        alert("You have to select the facilitator age!");
+        alert("You have to select the facilitator's age!");
         return false;
       }
     }

@@ -178,7 +178,7 @@ function InterCoder() {
 
       // Now we add the categories
       behaviorsToValidate.push({
-        name: "Confort",
+        name: "Comfort",
         type: "Confort",
         id: "confort",
         coder1: [],
@@ -432,9 +432,15 @@ function InterCoder() {
       const agreementPercentage = ((a + d) * 100) / (a + b + c + d);
       behavior.agreementPercentage = agreementPercentage;
 
+      // console.log("agreementPercentage", agreementPercentage);
+      // if (agreementPercentage === 87.5) {
+      //   debugger;
+      // }
+
       if (a === 0 || d === 0) {
         // No se puede calcular Kappa de Cohen
         behavior.kappa = "N / A";
+        behavior.kappaError = a === 0 ? "(YY is 0)" : "(NN is 0)";
       } else {
         let kappa_v2 = (p0_v2 - pe_v2) / (1 - pe_v2);
         // Round to 3 decimals
@@ -569,6 +575,12 @@ function InterCoder() {
                       style={{ backgroundColor: kappaColor }}
                     >
                       Kappa: {behavior.kappa}
+                      {behavior.kappaError && (
+                        <span style={{ fontSize: "12px" }}>
+                          {" "}
+                          - {behavior.kappaError}
+                        </span>
+                      )}
                     </div>
                   </div>
                 );
@@ -592,6 +604,12 @@ function InterCoder() {
                       style={{ backgroundColor: kappaColor }}
                     >
                       Kappa: {behavior.kappa}
+                      {behavior.kappaError && (
+                        <span style={{ fontSize: "12px" }}>
+                          {" "}
+                          - {behavior.kappaError}
+                        </span>
+                      )}
                     </div>
                   </div>
                 );
@@ -615,6 +633,12 @@ function InterCoder() {
                       style={{ backgroundColor: kappaColor }}
                     >
                       Kappa: {behavior.kappa}
+                      {behavior.kappaError && (
+                        <span style={{ fontSize: "12px" }}>
+                          {" "}
+                          - {behavior.kappaError}
+                        </span>
+                      )}
                     </div>
                   </div>
                 );
@@ -638,6 +662,12 @@ function InterCoder() {
                       style={{ backgroundColor: kappaColor }}
                     >
                       Kappa: {behavior.kappa}
+                      {behavior.kappaError && (
+                        <span style={{ fontSize: "12px" }}>
+                          {" "}
+                          - {behavior.kappaError}
+                        </span>
+                      )}
                     </div>
                   </div>
                 );
