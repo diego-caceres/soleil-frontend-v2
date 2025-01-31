@@ -10,14 +10,6 @@ import { loadBehaviors } from "src/redux/behaviors";
 
 import "./intercoder.css";
 
-// import { loadVideoNames, setSelectedVideo } from "src/redux/interCoder";
-import {
-  calculateIntercoderSimilarity,
-  getDateStringFromTimestamp,
-  isInBoth,
-  findSimilarBehavior,
-} from "src/utils";
-
 const behaviorTypesEnum = {
   confort: "Confort",
   exhibitUse: "Exhibit Use",
@@ -73,6 +65,7 @@ function InterCoder() {
     fetchCodings();
     dispatch(loadExhibits());
     dispatch(loadBehaviors());
+    //eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -100,7 +93,7 @@ function InterCoder() {
       );
       setCodingsB(codingsBfiltered);
     }
-  }, [evaluatorNameA, evaluatorNameB]);
+  }, [codings, evaluatorNameA, evaluatorNameB]);
 
   useEffect(() => {
     if (codingsA.length > 0 && codingsB.length > 0 && exhibitsList.length > 0) {
@@ -116,7 +109,7 @@ function InterCoder() {
       }));
       setExhibitOptions(exhibits);
     }
-  }, [codingsA, codingsB]);
+  }, [exhibitsList, codingsA, codingsB]);
 
   const handleCoderASelect = (event) => {
     const selectedCoderName = event.target.value;

@@ -4,7 +4,7 @@ import { getDocs, collection } from "firebase/firestore";
 
 import { db } from "../../config/firebase";
 import { SelectExhibit } from "../SelectExhibit";
-import { CSVLink, CSVDownload } from "react-csv";
+import { CSVLink } from "react-csv";
 
 import "./DownloadData.scss";
 import { getDateStringFromTimestamp } from "src/utils";
@@ -60,6 +60,7 @@ const DownloadDataPage = () => {
     }
 
     fetchCodings();
+    //eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -98,7 +99,7 @@ const DownloadDataPage = () => {
         setDataToDownload(null);
       }
     }
-  }, [selectedExhibit, selectedEvaluator]);
+  }, [allCodings, selectedExhibit, selectedEvaluator]);
 
   const handleCalculateData = () => {
     // We need to flatten the codings in an array
@@ -117,14 +118,7 @@ const DownloadDataPage = () => {
       } = coding;
 
       codingBehaviors.forEach((behavior) => {
-        const {
-          forFacilitator,
-          forVisitor,
-          name,
-          type,
-          timeMarked,
-          timeEnded,
-        } = behavior;
+        const { name, type, timeMarked, timeEnded } = behavior;
 
         csvData.push({
           "Coding Id": coding.id,

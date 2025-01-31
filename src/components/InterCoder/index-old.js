@@ -12,7 +12,6 @@ import {
   calculateIntercoderSimilarity,
   getDateStringFromTimestamp,
   isInBoth,
-  findSimilarBehavior,
 } from "src/utils";
 
 function InterCoder() {

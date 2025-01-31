@@ -68,7 +68,6 @@ const Coding = ({ coding }) => {
     evaluatorName,
     exhibitId,
     extraObservations,
-    facilitator,
   } = coding;
   return (
     <>

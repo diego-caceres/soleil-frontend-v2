@@ -150,25 +150,25 @@ function GenericComparisonChart() {
   );
 }
 
-function CustomBar(props) {
-  const { x, y, width, height, color, label } = props;
-  const formattedLabel = `${label} %`;
+// function CustomBar(props) {
+//   const { x, y, width, height, color, label } = props;
+//   const formattedLabel = `${label} %`;
 
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <rect width={width} height={height} fill={color} />
-      <text
-        x={width / 2}
-        y={height / 2}
-        textAnchor="middle"
-        dominantBaseline="middle"
-        fill="white"
-        fontSize={12}
-      >
-        {formattedLabel}
-      </text>
-    </g>
-  );
-}
+//   return (
+//     <g transform={`translate(${x},${y})`}>
+//       <rect width={width} height={height} fill={color} />
+//       <text
+//         x={width / 2}
+//         y={height / 2}
+//         textAnchor="middle"
+//         dominantBaseline="middle"
+//         fill="white"
+//         fontSize={12}
+//       >
+//         {formattedLabel}
+//       </text>
+//     </g>
+//   );
+// }
 
 export default GenericComparisonChart;

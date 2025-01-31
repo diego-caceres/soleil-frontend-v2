@@ -13,7 +13,8 @@ export const Router = () => {
   const [loggedIn, setLoggedIn] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    // const unsubscribe =
+    auth.onAuthStateChanged((user) => {
       if (user) {
         setLoggedIn(true);
         const displayName = user.displayName || user.email;
@@ -30,6 +31,7 @@ export const Router = () => {
         console.log("User is logged out");
       }
     });
+    //eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loggedIn === true) {

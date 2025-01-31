@@ -1,9 +1,6 @@
 import "./CodingStart.scss";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import { signOut } from "firebase/auth";
 import { auth } from "../../config/firebase";
 import SoleilLogo from "src/components/SoleilLogo";
 import { SelectExhibit } from "../SelectExhibit";
@@ -13,20 +10,17 @@ const CodingStart = () => {
   const displayName =
     auth?.currentUser?.displayName || auth?.currentUser?.email;
 
-  const exhibitsStore = useSelector((state) => state.exhibits);
-  const { selectedExhibit } = exhibitsStore;
-
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => {
-        // Sign-out successful.
-        navigate("/");
-        console.log("Signed out successfully");
-      })
-      .catch((error) => {
-        // An error happened.
-      });
-  };
+  // const handleLogout = () => {
+  //   signOut(auth)
+  //     .then(() => {
+  //       // Sign-out successful.
+  //       navigate("/");
+  //       console.log("Signed out successfully");
+  //     })
+  //     .catch((error) => {
+  //       // An error happened.
+  //     });
+  // };
 
   return (
     <div className="container-start">

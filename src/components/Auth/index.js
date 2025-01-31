@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 import { auth } from "../../config/firebase";
 import { setEvaluator } from "src/redux/exhibits";
@@ -22,14 +19,6 @@ export const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
-  const handleSignIn = async () => {
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const handleLoginIn = async () => {
     setError("");
@@ -63,20 +52,16 @@ export const Auth = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      {/* <button onClick={handleSignIn}>Sign In</button> */}
-
       <button className="login-btn" onClick={handleLoginIn}>
         Login
       </button>
 
       <div className="errorWrapper">{error && <p>{error}</p>}</div>
-
-      {/* <SeedComponent /> */}
     </div>
   );
 };
 
-const SeedComponent = () => {
+export const SeedComponent = () => {
   const handleExhibitsCreation = async () => {
     await createExibits();
   };
