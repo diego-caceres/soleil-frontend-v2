@@ -35,6 +35,7 @@ const isCodingInGroup = (coding, group) => {
 
 function GenericComparisonChart() {
   const [codings, setCodings] = useState([]);
+  const [chartKeys, setChartKeys] = useState(["Group A", "Group B", "Group C"]);
   const [groupA, setGroupA] = useState(null);
   const [groupB, setGroupB] = useState(null);
   const [groupC, setGroupC] = useState(null);
@@ -216,6 +217,7 @@ function GenericComparisonChart() {
       setErrorA("");
       setErrorB("");
       setErrorC("");
+      updateChartBarKeys();
 
       if (groupB && !groupC) {
         calculateChiSquared();
@@ -236,7 +238,7 @@ function GenericComparisonChart() {
     }
   };
 
-  const getChartBarKeys = () => {
+  const updateChartBarKeys = () => {
     const keys = [];
     if (groupA) {
       keys.push("Group A");
@@ -248,7 +250,7 @@ function GenericComparisonChart() {
       keys.push("Group C");
     }
 
-    return keys;
+    setChartKeys(keys);
   };
 
   return (
@@ -300,7 +302,7 @@ function GenericComparisonChart() {
               >
                 <ResponsiveBar
                   data={data}
-                  keys={getChartBarKeys()}
+                  keys={chartKeys}
                   indexBy="category"
                   margin={{ top: 20, right: 30, bottom: 150, left: 50 }}
                   groupMode="grouped"
