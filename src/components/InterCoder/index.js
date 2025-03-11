@@ -430,6 +430,7 @@ function InterCoder() {
       //   debugger;
       // }
 
+      behavior.kappaInfo = `A: ${a} - B: ${b} - C: ${c} - D: ${d}`;
       if (a === 0 || d === 0) {
         // No se puede calcular Kappa de Cohen
         behavior.kappa = "N / A";
@@ -566,6 +567,7 @@ function InterCoder() {
                     <div
                       className="behavior-row-data"
                       style={{ backgroundColor: kappaColor }}
+                      title={behavior.kappaInfo}
                     >
                       Kappa: {behavior.kappa}
                       {behavior.kappaError && (
@@ -595,6 +597,7 @@ function InterCoder() {
                     <div
                       className="behavior-row-data"
                       style={{ backgroundColor: kappaColor }}
+                      title={behavior.kappaInfo}
                     >
                       Kappa: {behavior.kappa}
                       {behavior.kappaError && (
@@ -624,6 +627,7 @@ function InterCoder() {
                     <div
                       className="behavior-row-data"
                       style={{ backgroundColor: kappaColor }}
+                      title={behavior.kappaInfo}
                     >
                       Kappa: {behavior.kappa}
                       {behavior.kappaError && (
@@ -653,6 +657,7 @@ function InterCoder() {
                     <div
                       className="behavior-row-data"
                       style={{ backgroundColor: kappaColor }}
+                      title={behavior.kappaInfo}
                     >
                       Kappa: {behavior.kappa}
                       {behavior.kappaError && (
