@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { getDocs, collection } from "firebase/firestore";
 import { db } from "../../config/firebase";
 
-import Select from "react-select";
 
 import "./intercoder.css";
 
@@ -17,13 +16,11 @@ import {
 function InterCoder() {
   const [codings, setCodings] = useState([]);
   const [videoNames, setVideoNames] = useState([]);
-  const [deltaTime, setDeltaTime] = useState(1.5);
+  const [deltaTime] = useState(1.5);
   const [selectedVideo, setSelectedVideo] = useState("");
   const [codingA, setCodingA] = useState("");
   const [codingB, setCodingB] = useState("");
   const [interCoderReliability, setInterCoderReliability] = useState(null);
-  const [interCoderReliabilityITE, setInterCoderReliabilityITE] =
-    useState(null);
 
   useEffect(() => {
     async function fetchCodings() {
@@ -62,7 +59,6 @@ function InterCoder() {
     );
     setCodingA(selectedCoding);
     setInterCoderReliability(null);
-    setInterCoderReliabilityITE(null);
   };
 
   const handleCodingBSelect = (event) => {
@@ -72,7 +68,6 @@ function InterCoder() {
     );
     setCodingB(selectedCoding);
     setInterCoderReliability(null);
-    setInterCoderReliabilityITE(null);
   };
 
   const isCalculateButtonEnabled = codingA && codingB;
@@ -90,13 +85,12 @@ function InterCoder() {
     setInterCoderReliability(intercoderSimilarity);
 
     // ITE Ignore Time Ended
-    const intercoderSimilarityITE = calculateIntercoderSimilarity(
+    calculateIntercoderSimilarity(
       codingA,
       codingB,
       deltaTime,
       true
     );
-    setInterCoderReliabilityITE(intercoderSimilarityITE);
   };
 
   const renderCodingBehaviorsComparison = () => {
@@ -105,7 +99,7 @@ function InterCoder() {
     }
 
     let behaviorANames = [];
-    let codingABehaviorsFiltered = codingA.codingBehaviors.filter(
+    codingA.codingBehaviors.filter(
       (behavior) => {
         if (!behaviorANames.includes(behavior.name)) {
           behaviorANames.push(behavior.name);
@@ -116,7 +110,7 @@ function InterCoder() {
     );
 
     let behaviorBNames = [];
-    let codingBBehaviorsFiltered = codingB.codingBehaviors.filter(
+    codingB.codingBehaviors.filter(
       (behavior) => {
         if (!behaviorBNames.includes(behavior.name)) {
           behaviorBNames.push(behavior.name);
@@ -164,36 +158,6 @@ function InterCoder() {
     );
   };
 
-  const renderCodingBehaviorsComparisonReversed = () => {
-    if (!codingA || !codingB) {
-      return null;
-    }
-
-    return (
-      <table>
-        <thead>
-          <tr>
-            <th>Coding B Behavior</th>
-          </tr>
-        </thead>
-        <tbody className="table-body">
-          {codingB.codingBehaviors.map((behaviorB, index) => (
-            <tr
-              key={index}
-              style={{
-                backgroundColor: "white",
-              }}
-            >
-              <td>
-                {behaviorB.name} - {behaviorB.type} - [{behaviorB.timeMarked} to{" "}
-                {behaviorB.timeEnded}]
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
-  };
 
   return (
     <div className="intercoder-wrapper">

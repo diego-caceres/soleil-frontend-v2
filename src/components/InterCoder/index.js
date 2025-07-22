@@ -125,7 +125,7 @@ function InterCoder() {
     let auxCodingsA = [...codingsA];
     let auxCodingsB = [...codingsB];
 
-    debugger;
+    // debugger;
     // If selected Exhibits, filter exhibits:
     if (selectedExhibits.length > 0) {
       auxCodingsA = auxCodingsA.filter((coding) =>
@@ -217,7 +217,7 @@ function InterCoder() {
         );
 
         if (!codingCoder1 || !codingCoder2) {
-          debugger;
+          // debugger;
         }
 
         let confortCoder1 = false;
@@ -360,7 +360,7 @@ function InterCoder() {
       });
 
       console.log("behaviorsToValidate", behaviorsToValidate);
-      debugger;
+      // debugger;
       calculateKappaCohen(behaviorsToValidate);
     }
   };

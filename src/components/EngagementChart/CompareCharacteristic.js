@@ -105,8 +105,6 @@ function GenericComparisonChart() {
   console.log("percentageData", percentageData);
   console.log("data", data);
 
-  const format = (v) => `${v}%`;
-
   return (
     <div>
       <h1>Visitor Engagement Profile</h1>

@@ -114,7 +114,6 @@ function GenericComparisonChart() {
     for (const coding of codings) {
       const codingLevel = calculateCodingLevel(coding.codingBehaviors);
       const isGroupA = isCodingInGroup(coding, groupA);
-      const isGroupB = isCodingInGroup(coding, groupB);
 
       const codingLevelNumber =
         codingLevel === "Initiation" ? 0 : codingLevel === "Transition" ? 1 : 2;
@@ -138,19 +137,19 @@ function GenericComparisonChart() {
   const calculatePercentageData = () => {
     const codingsGroupData = {
       Initiation: {
-        ["Group A"]: 0,
-        ["Group B"]: 0,
-        ["Group C"]: 0,
+        "Group A": 0,
+        "Group B": 0,
+        "Group C": 0,
       },
       Transition: {
-        ["Group A"]: 0,
-        ["Group B"]: 0,
-        ["Group C"]: 0,
+        "Group A": 0,
+        "Group B": 0,
+        "Group C": 0,
       },
       Breakthrough: {
-        ["Group A"]: 0,
-        ["Group B"]: 0,
-        ["Group C"]: 0,
+        "Group A": 0,
+        "Group B": 0,
+        "Group C": 0,
       },
     };
 
@@ -207,8 +206,6 @@ function GenericComparisonChart() {
       return "Initiation";
     }
   };
-
-  const format = (v) => `${v}%`;
 
   // Refresh chart when pressing Generate
   const onGenerateClicked = () => {
@@ -347,25 +344,5 @@ function GenericComparisonChart() {
   );
 }
 
-function CustomBar(props) {
-  const { x, y, width, height, color, label } = props;
-  const formattedLabel = `${label} %`;
-
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <rect width={width} height={height} fill={color} />
-      <text
-        x={width / 2}
-        y={height / 2}
-        textAnchor="middle"
-        dominantBaseline="middle"
-        fill="white"
-        fontSize={12}
-      >
-        {formattedLabel}
-      </text>
-    </g>
-  );
-}
 
 export default GenericComparisonChart;
