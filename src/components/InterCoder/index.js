@@ -17,6 +17,12 @@ const behaviorTypesEnum = {
   information: "Information",
 };
 
+const visitorBehaviorTypesEnum = {
+  initiation: "Initiation",
+  transition: "Transition",
+  breakthrough: "Breakthrough",
+};
+
 function InterCoder() {
   const dispatch = useDispatch();
 
@@ -40,6 +46,13 @@ function InterCoder() {
   const [exhibitUseRow, setExhibitUseRow] = useState([]);
   const [reflectionRow, setReflectionRow] = useState([]);
   const [informationRow, setInformationRow] = useState([]);
+
+  const [visitorBehaviorsWithKappa, setVisitorBehaviorsWithKappa] = useState(
+    []
+  );
+  const [visitorInitiationRow, setVisitorInitiationRow] = useState([]);
+  const [visitorTransitionRow, setVisitorTransitionRow] = useState([]);
+  const [visitorBreakthroughRow, setVisitorBreakthroughRow] = useState([]);
 
   const exhibitsStore = useSelector((state) => state.exhibits);
   const { list: exhibitsList } = exhibitsStore;
@@ -363,6 +376,188 @@ function InterCoder() {
       // debugger;
       calculateKappaCohen(behaviorsToValidate);
     }
+
+    // Process visitorBehaviors similar to facilitatorBehaviors
+    if (visitorBehaviors) {
+      let visitorBehaviorsToValidate = [];
+
+      visitorBehaviors.forEach((behavior) => {
+        // Skip Takes Photo, Reads signage and Visitor Visitor interacion
+        if (!behavior.type) {
+          return;
+        }
+        visitorBehaviorsToValidate.push({
+          name: behavior.name,
+          id: behavior.id,
+          type: behavior.type,
+          coder1: [],
+          coder2: [],
+          isCategory: false,
+        });
+      });
+
+      // Add the 3 visitor behavior categories
+      visitorBehaviorsToValidate.push({
+        name: "Initiation",
+        type: "Initiation",
+        id: "initiation",
+        coder1: [],
+        coder2: [],
+        isCategory: true,
+      });
+      visitorBehaviorsToValidate.push({
+        name: "Transition",
+        type: "Transition",
+        id: "transition",
+        coder1: [],
+        coder2: [],
+        isCategory: true,
+      });
+      visitorBehaviorsToValidate.push({
+        name: "Breakthrough",
+        type: "Breakthrough",
+        id: "breakthrough",
+        coder1: [],
+        coder2: [],
+        isCategory: true,
+      });
+
+      // Process each video for visitor behaviors
+      uniqueVideoNames.forEach((videoName) => {
+        const codingCoder1 = codingsByBoth.find(
+          (coding) =>
+            coding.videoName === videoName &&
+            coding.evaluatorName === evaluatorNameA
+        );
+        const codingCoder2 = codingsByBoth.find(
+          (coding) =>
+            coding.videoName === videoName &&
+            coding.evaluatorName === evaluatorNameB
+        );
+
+        if (!codingCoder1 || !codingCoder2) {
+          console.log("Error, debug here");
+        }
+
+        debugger;
+        let visitorInitiationCoder1 = false;
+        let visitorTransitionCoder1 = false;
+        let visitorBreakthroughCoder1 = false;
+
+        let visitorInititationCoder2 = false;
+        let visitorTransitionCoder2 = false;
+        let visitorBreakthroughCoder2 = false;
+
+        visitorBehaviorsToValidate.forEach((behavior) => {
+          if (!behavior.isCategory) {
+            // Coding behaviors that are not categories
+            const codingBehavior1 = codingCoder1.codingBehaviors.find(
+              (codingBehavior) => codingBehavior.id === behavior.id
+            );
+
+            const codingBehavior2 = codingCoder2.codingBehaviors.find(
+              (codingBehavior) => codingBehavior.id === behavior.id
+            );
+
+            behavior.coder1.push({
+              videoName: videoName,
+              found: codingBehavior1 ? true : false,
+            });
+            if (codingBehavior1) {
+              if (
+                codingBehavior1.type === visitorBehaviorTypesEnum.initiation &&
+                !visitorInitiationCoder1
+              ) {
+                visitorInitiationCoder1 = true;
+              }
+              if (
+                codingBehavior1.type === visitorBehaviorTypesEnum.transition &&
+                !visitorTransitionCoder1
+              ) {
+                visitorTransitionCoder1 = true;
+              }
+              if (
+                codingBehavior1.type ===
+                  visitorBehaviorTypesEnum.breakthrough &&
+                !visitorBreakthroughCoder1
+              ) {
+                visitorBreakthroughCoder1 = true;
+              }
+            }
+
+            behavior.coder2.push({
+              videoName: videoName,
+              found: codingBehavior2 ? true : false,
+            });
+            if (codingBehavior2) {
+              if (
+                codingBehavior2.type === visitorBehaviorTypesEnum.initiation &&
+                !visitorInititationCoder2
+              ) {
+                visitorInititationCoder2 = true;
+              }
+              if (
+                codingBehavior2.type === visitorBehaviorTypesEnum.transition &&
+                !visitorTransitionCoder2
+              ) {
+                visitorTransitionCoder2 = true;
+              }
+              if (
+                codingBehavior2.type ===
+                  visitorBehaviorTypesEnum.breakthrough &&
+                !visitorBreakthroughCoder2
+              ) {
+                visitorBreakthroughCoder2 = true;
+              }
+            }
+          }
+        });
+
+        // After all visitor behaviors of this video have been checked, we review categories
+        visitorBehaviorsToValidate.forEach((behavior) => {
+          if (
+            behavior.isCategory &&
+            behavior.type === visitorBehaviorTypesEnum.initiation
+          ) {
+            behavior.coder1.push({
+              videoName: videoName,
+              found: visitorInitiationCoder1,
+            });
+            behavior.coder2.push({
+              videoName: videoName,
+              found: visitorInititationCoder2,
+            });
+          } else if (
+            behavior.isCategory &&
+            behavior.type === visitorBehaviorTypesEnum.transition
+          ) {
+            behavior.coder1.push({
+              videoName: videoName,
+              found: visitorTransitionCoder1,
+            });
+            behavior.coder2.push({
+              videoName: videoName,
+              found: visitorTransitionCoder2,
+            });
+          } else if (
+            behavior.isCategory &&
+            behavior.type === visitorBehaviorTypesEnum.breakthrough
+          ) {
+            behavior.coder1.push({
+              videoName: videoName,
+              found: visitorBreakthroughCoder1,
+            });
+            behavior.coder2.push({
+              videoName: videoName,
+              found: visitorBreakthroughCoder2,
+            });
+          }
+        });
+      });
+
+      console.log("visitorBehaviorsToValidate", visitorBehaviorsToValidate);
+      calculateVisitorKappaCohen(visitorBehaviorsToValidate);
+    }
   };
 
   const calculateKappaCohen = (behaviors) => {
@@ -466,6 +661,77 @@ function InterCoder() {
     setInformationRow(auxInformation);
   };
 
+  const calculateVisitorKappaCohen = (behaviors) => {
+    behaviors.forEach((behavior) => {
+      const clipsCoder1 = behavior.coder1;
+      const clipsCoder2 = behavior.coder2;
+
+      let totalClips = clipsCoder1.length;
+      let totalClipsYY = 0;
+      let totalClipsYN = 0;
+      let totalClipsNY = 0;
+      let totalClipsNN = 0;
+
+      for (let i = 0; i < totalClips; i++) {
+        const clipCoder1 = clipsCoder1[i];
+        const clipCoder2 = clipsCoder2[i];
+
+        if (clipCoder1.found && clipCoder2.found) {
+          totalClipsYY += 1;
+        } else if (clipCoder1.found && !clipCoder2.found) {
+          totalClipsYN += 1;
+        } else if (!clipCoder1.found && clipCoder2.found) {
+          totalClipsNY += 1;
+        } else if (!clipCoder1.found && !clipCoder2.found) {
+          totalClipsNN += 1;
+        }
+      }
+
+      // Wikipedias way
+      const a = totalClipsYY;
+      const b = totalClipsYN;
+      const c = totalClipsNY;
+      const d = totalClipsNN;
+
+      const p0_v2 = (a + d) / (a + b + c + d);
+      const pYes = ((a + b) / (a + b + c + d)) * ((a + c) / (a + b + c + d));
+      const pNo = ((c + d) / (a + b + c + d)) * ((b + d) / (a + b + c + d));
+      const pe_v2 = pYes + pNo;
+
+      const agreementPercentage = ((a + d) * 100) / (a + b + c + d);
+      behavior.agreementPercentage = agreementPercentage;
+
+      behavior.kappaInfo = `A: ${a} - B: ${b} - C: ${c} - D: ${d}`;
+      if (a === 0 || d === 0) {
+        // No se puede calcular Kappa de Cohen
+        behavior.kappa = "N / A";
+        behavior.kappaError = a === 0 ? "(YY is 0)" : "(NN is 0)";
+      } else {
+        let kappa_v2 = (p0_v2 - pe_v2) / (1 - pe_v2);
+        // Round to 3 decimals
+        kappa_v2 = Math.round(kappa_v2 * 1000) / 1000;
+        behavior.kappa = kappa_v2;
+      }
+    });
+
+    console.log("visitor behaviors with Kappa", behaviors);
+    setVisitorBehaviorsWithKappa(behaviors);
+
+    const auxVisitorInitiation = behaviors.filter(
+      (b) => b.type === visitorBehaviorTypesEnum.initiation
+    );
+    const auxVisitorTransition = behaviors.filter(
+      (b) => b.type === visitorBehaviorTypesEnum.transition
+    );
+    const auxVisitorBreakthrough = behaviors.filter(
+      (b) => b.type === visitorBehaviorTypesEnum.breakthrough
+    );
+
+    setVisitorInitiationRow(auxVisitorInitiation);
+    setVisitorTransitionRow(auxVisitorTransition);
+    setVisitorBreakthroughRow(auxVisitorBreakthrough);
+  };
+
   const getKappaColor = (kappa) => {
     if (isNaN(kappa)) {
       return "#000000";
@@ -552,6 +818,7 @@ function InterCoder() {
 
         {behaviorsWithKappa.length > 0 && (
           <>
+            <h3>Facilitator Behaviors</h3>
             <div className="behavior-row">
               {confortRow.map((behavior, index) => {
                 const kappaColor = getKappaColor(behavior.kappa);
@@ -644,6 +911,101 @@ function InterCoder() {
 
             <div className="behavior-row">
               {informationRow.map((behavior, index) => {
+                const kappaColor = getKappaColor(behavior.kappa);
+                return (
+                  <div
+                    key={`${index}-${behavior.name}`}
+                    className="behavior-cell"
+                  >
+                    <div className="behavior-row-name">{behavior.name}</div>
+                    <div className="behavior-row-data">
+                      Agreement: {behavior.agreementPercentage.toFixed(2)}%
+                    </div>
+                    <div
+                      className="behavior-row-data"
+                      style={{ backgroundColor: kappaColor }}
+                      title={behavior.kappaInfo}
+                    >
+                      Kappa: {behavior.kappa}
+                      {behavior.kappaError && (
+                        <span style={{ fontSize: "12px" }}>
+                          {" "}
+                          - {behavior.kappaError}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        {visitorBehaviorsWithKappa.length > 0 && (
+          <>
+            <h3>Visitor Behaviors</h3>
+            <div className="behavior-row">
+              {visitorInitiationRow.map((behavior, index) => {
+                const kappaColor = getKappaColor(behavior.kappa);
+                return (
+                  <div
+                    key={`${index}-${behavior.name}`}
+                    className="behavior-cell"
+                  >
+                    <div className="behavior-row-name">{behavior.name}</div>
+                    <div className="behavior-row-data">
+                      Agreement: {behavior.agreementPercentage.toFixed(2)}%
+                    </div>
+                    <div
+                      className="behavior-row-data"
+                      style={{ backgroundColor: kappaColor }}
+                      title={behavior.kappaInfo}
+                    >
+                      Kappa: {behavior.kappa}
+                      {behavior.kappaError && (
+                        <span style={{ fontSize: "12px" }}>
+                          {" "}
+                          - {behavior.kappaError}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="behavior-row">
+              {visitorTransitionRow.map((behavior, index) => {
+                const kappaColor = getKappaColor(behavior.kappa);
+                return (
+                  <div
+                    key={`${index}-${behavior.name}`}
+                    className="behavior-cell"
+                  >
+                    <div className="behavior-row-name">{behavior.name}</div>
+                    <div className="behavior-row-data">
+                      Agreement: {behavior.agreementPercentage.toFixed(2)}%
+                    </div>
+                    <div
+                      className="behavior-row-data"
+                      style={{ backgroundColor: kappaColor }}
+                      title={behavior.kappaInfo}
+                    >
+                      Kappa: {behavior.kappa}
+                      {behavior.kappaError && (
+                        <span style={{ fontSize: "12px" }}>
+                          {" "}
+                          - {behavior.kappaError}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="behavior-row">
+              {visitorBreakthroughRow.map((behavior, index) => {
                 const kappaColor = getKappaColor(behavior.kappa);
                 return (
                   <div
