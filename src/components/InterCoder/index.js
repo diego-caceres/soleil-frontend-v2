@@ -19,6 +19,9 @@ const behaviorTypesEnum = {
 
 function InterCoder() {
   const dispatch = useDispatch();
+
+  const [showUniqueVideos, setShowUniqueVideos] = useState(false);
+
   const [codings, setCodings] = useState([]);
   const [codingsA, setCodingsA] = useState([]);
   const [codingsB, setCodingsB] = useState([]);
@@ -41,10 +44,8 @@ function InterCoder() {
   const exhibitsStore = useSelector((state) => state.exhibits);
   const { list: exhibitsList } = exhibitsStore;
   const behaviorsStore = useSelector((state) => state.behaviors);
-  const { facilitatorBehaviors } = behaviorsStore;
-
-  // const [codingA, setCodingA] = useState("");
-  // const [codingB, setCodingB] = useState("");
+  const { facilitatorBehaviors, visitorBehaviors } = behaviorsStore;
+  console.log("visitorBehaviors", visitorBehaviors);
 
   useEffect(() => {
     async function fetchCodings() {
@@ -125,7 +126,6 @@ function InterCoder() {
     let auxCodingsA = [...codingsA];
     let auxCodingsB = [...codingsB];
 
-    // debugger;
     // If selected Exhibits, filter exhibits:
     if (selectedExhibits.length > 0) {
       auxCodingsA = auxCodingsA.filter((coding) =>
@@ -217,7 +217,7 @@ function InterCoder() {
         );
 
         if (!codingCoder1 || !codingCoder2) {
-          // debugger;
+          console.log("Error, debug here");
         }
 
         let confortCoder1 = false;
@@ -676,16 +676,23 @@ function InterCoder() {
 
         {behaviorsWithKappa.length > 0 && uniqueVideoNamesDebug.length > 0 && (
           <>
-            List of Unique Videos:
-            <div>
-              {uniqueVideoNamesDebug.map((videoName, index) => {
-                return (
-                  <div key={index}>
-                    <span>{videoName}</span>
-                  </div>
-                );
-              })}
-            </div>
+            <button onClick={() => setShowUniqueVideos(!showUniqueVideos)}>
+              {showUniqueVideos ? "Hide" : "Show"} Unique Videos
+            </button>
+            {showUniqueVideos && (
+              <div>
+                <p>List of Unique Videos:</p>
+                <div>
+                  {uniqueVideoNamesDebug.map((videoName, index) => {
+                    return (
+                      <div key={index}>
+                        <span>{videoName}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </>
         )}
 
