@@ -1,70 +1,208 @@
-# Getting Started with Create React App
+# Soleil Coding Tool
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**A comprehensive visitor behavior coding and analysis platform for science museums and educational institutions.**
 
-## Available Scripts
+Soleil enables researchers and evaluators to systematically observe, record, and analyze visitor interactions with museum exhibits to understand engagement patterns and learning behaviors in informal learning environments.
 
-In the project directory, you can run:
+## 🌟 Overview
 
-### `yarn start`
+Soleil (Sun in French) illuminates visitor behavior patterns through systematic behavioral coding and statistical analysis. The platform supports both live observation and video analysis, providing researchers with powerful tools to understand how visitors engage with museum exhibits and how facilitators can enhance those experiences.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## ✨ Key Features
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### 🎯 **Behavioral Coding System**
 
-### `yarn test`
+- **Live Coding**: Real-time observation with built-in timer during actual museum visits
+- **Video Coding**: Frame-by-frame analysis of pre-recorded visitor interactions
+- **Dual Actor Tracking**: Separate behavior tracking for visitors and facilitators
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 👥 **Comprehensive Visitor Profiling**
 
-### `yarn build`
+- Demographics (gender, age range, group size)
+- Background (education level, museum familiarity, visitor type)
+- Contextual factors (language, special conditions, visit day status)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 📊 **Behavioral Classification Framework**
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+#### Visitor Engagement Levels:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **Initiation**: Basic interaction (doing/observing activities)
+- **Transition**: Deeper engagement (repeating activities, positive responses)
+- **Breakthrough**: Advanced engagement (sharing, seeking information, deep involvement)
 
-### `yarn eject`
+#### Facilitator Behavior Categories:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- **Comfort**: Building rapport and encouraging participation
+- **Information**: Providing context, explanations, and facts
+- **Exhibit Use**: Demonstrating features and providing technical assistance
+- **Reflection**: Making connections and inviting deeper thinking
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 📈 **Advanced Analytics**
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- **Inter-Rater Reliability**: Cohen's Kappa calculation with visual indicators
+- **Visitor Engagement Profile (VEP)**: Comparative analysis between groups
+- **Statistical Testing**: Chi-squared and Kendall's Tau correlation analysis
+- **Interactive Visualizations**: Dynamic charts for engagement distribution
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### 💾 **Data Management**
 
-## Learn More
+- Cloud-based storage with Firebase
+- CSV export functionality
+- Multi-evaluator support with filtering
+- Historical coding review and management
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🛠️ Technology Stack
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Frontend
 
-### Code Splitting
+- **React 17.0.2** - Modern UI framework with hooks
+- **Redux Toolkit** - Centralized state management
+- **React Router 6** - Navigation and routing
+- **SCSS/Sass** - Advanced styling
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Visualization & Analysis
 
-### Analyzing the Bundle Size
+- **@nivo/bar** - Interactive data visualizations
+- **statistics.js** - Statistical analysis calculations
+- **react-csv** - Data export capabilities
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Media & Interaction
 
-### Making a Progressive Web App
+- **react-player** - Precise video playback controls
+- **react-timer-hook** - Real-time behavioral timing
+- **react-select** - Enhanced form controls
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Backend Services
 
-### Advanced Configuration
+- **Firebase 9.21.0** (Firestore + Auth) - Cloud database and authentication
+- **Node.js API** - Backend services for complex data processing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## 🚀 Getting Started
 
-### Deployment
+### Prerequisites
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- Node.js (v14 or higher)
+- npm or yarn package manager
+- Firebase project setup
 
-### `yarn build` fails to minify
+### Installation
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1. **Clone the repository**
+
+   ```bash
+   git clone [repository-url]
+   cd soleil-frontend-v2
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **Configure Firebase**
+
+   - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
+   - Enable Firestore Database and Authentication
+   - Copy your Firebase configuration to `src/config/firebase.js`
+
+4. **Start development server**
+
+   ```bash
+   npm start
+   # or
+   yarn start
+   ```
+
+   The application will open at [http://localhost:3000](http://localhost:3000)
+
+### Available Scripts
+
+- **`npm start`** - Runs the development server
+- **`npm test`** - Launches the test runner
+- **`npm run build`** - Builds the app for production
+- **`npm run lint`** - Run ESLint to check for code issues
+
+## 📱 Application Structure
+
+```
+src/
+├── components/
+│   ├── Auth/              # Authentication components
+│   ├── CodingLive/        # Live behavioral coding
+│   ├── CodingVideo/       # Video-based coding
+│   ├── CodingsList/       # Historical coding management
+│   ├── EngagementChart/   # Data visualization and analytics
+│   ├── InterCoder/        # Inter-rater reliability analysis
+│   └── DownloadDataPage/  # Data export functionality
+├── config/
+│   └── firebase.js        # Firebase configuration
+├── redux/
+│   ├── behaviors.js       # Behavior taxonomy state
+│   ├── codings.js         # Coding sessions state
+│   ├── exhibits.js        # Exhibit information state
+│   └── store.js           # Redux store configuration
+└── utils.js               # Utility functions and calculations
+```
+
+## 🔄 Usage Workflow
+
+1. **Authentication**: Log in with authorized researcher credentials
+2. **Exhibit Selection**: Choose the museum exhibit to observe
+3. **Behavioral Coding**:
+   - **Live Mode**: Start timer and code behaviors in real-time
+   - **Video Mode**: Load video file and code frame-by-frame
+4. **Data Collection**: Record visitor demographics and facilitator interactions
+5. **Analysis**: Generate engagement profiles and statistical comparisons
+6. **Export**: Download data in CSV format for further analysis
+
+## 📊 Research Applications
+
+- **Museum Evaluation Research**: Systematic assessment of exhibit effectiveness
+- **Learning Behavior Analysis**: Understanding visitor engagement patterns
+- **Facilitator Training**: Analyzing staff interaction effectiveness
+- **Exhibit Design Optimization**: Data-driven design improvements
+- **Academic Research**: Quantitative behavioral analysis in informal learning
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```
+REACT_APP_FIREBASE_API_KEY=your_api_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your_auth_domain
+REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+REACT_APP_FIREBASE_APP_ID=your_app_id
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 📞 Support
+
+For questions, issues, or feature requests, please create an issue in the repository or contact the development team.
+
+## 🙏 Acknowledgments
+
+- Science museum professionals and researchers who provided valuable feedback
+- The informal learning research community
+- Firebase and React development teams for excellent documentation
+
+---
+
+**Built with ❤️ for the science museum and informal learning research community**
